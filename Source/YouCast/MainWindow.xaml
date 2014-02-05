@@ -1,0 +1,96 @@
+﻿<Window x:Class="YouCast.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Loaded="Window_Loaded_1"
+        Icon="rss.ico"
+        StateChanged="Window_StateChanged_1"
+        FontFamily="tahoma"
+        FontSize="13"
+        Title="YouCast" Height="295" Width="463" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+    <TabControl>
+        <TabItem Header="Podcast">
+                <StackPanel>
+                    <GroupBox>
+                    <GroupBox.Header>
+                        <Label>Configuration</Label>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <DockPanel>
+                            <ComboBox Name="ComboBox" DockPanel.Dock="Left" SelectedIndex="0"
+                                        SelectionChanged="ComboBox_SelectionChanged_1">
+                                <ListBoxItem Name="UserNameItem" Content="User Name" />
+                                <ListBoxItem Name="PlaylistItem" Content="Playlist ID" />
+                            </ComboBox>
+                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" x:Name="Input"
+                                        VerticalContentAlignment="Center" GotFocus="_input_GotFocus_1"
+                                        TextChanged="_input_TextChanged_1">
+                                For example: I3arnon
+                            </TextBox>
+                        </DockPanel>
+                        <DockPanel>
+                            <DockPanel>
+                                <Label>Preferred Quality:</Label>
+                                <ComboBox MinWidth="130" x:Name="Quality" HorizontalContentAlignment="Right"></ComboBox>
+                            </DockPanel>
+                            <DockPanel >
+                                <Label DockPanel.Dock="Left">Quantity:</Label>
+                                <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right"  x:Name="MaxLength" VerticalContentAlignment="Center" GotFocus="_maxLength_GotFocus_1"  PreviewTextInput="_maxLength_PreviewTextInput_1" >Unlimited: 0</TextBox>
+                            </DockPanel>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <CheckBox 
+                        x:Name="CheckBox" Margin="5,5,5,0" 
+                        ToolTip="The popular videos will have an older publish date."
+                        VerticalContentAlignment="Center">Sort by Popularity</CheckBox>
+                    <Button 
+                        ToolTip="Create a link and add it to your favorite podcatcher"
+                        IsDefault="True" x:Name="Generate" IsEnabled="False" Margin="5,5,5,0" Click="Button_Click_1" Height="26">Generate and Copy</Button>
+                    <Button x:Name="Copy" Margin="5,5,5,5" IsEnabled="false" Visibility="Collapsed" Click="Button_Click_2">Copy to clipboard</Button>
+                </StackPanel>
+                <GroupBox>
+                    <GroupBox.Header>
+                        Podcast URL
+                    </GroupBox.Header>
+                    <DockPanel>
+                        <TextBox  MinHeight="38" IsReadOnly="True" TextWrapping="Wrap" DockPanel.Dock="Top"  x:Name="Output"></TextBox>
+                        <TextBlock TextWrapping="Wrap" DockPanel.Dock="Bottom" Padding="5">* Copy this URL to your favorite podcast client (iTunes, Zune PC, Media Monkey, etc.)</TextBlock>
+                    </DockPanel>
+                </GroupBox>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Settings">
+            <StackPanel>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <Label>Server Details</Label>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <DockPanel>
+                            <Label DockPanel.Dock="Left">Host Address:</Label>
+                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" Name="IpAddressLabel">localhost</TextBox>
+                        </DockPanel>
+                        <DockPanel>
+                            <Label DockPanel.Dock="Left">Port Number:</Label>
+                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" Name="PortLabel">22703</TextBox>
+                        </DockPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button 
+                                x:Name="Change" 
+                                Margin="5,5,5,5"
+                                ToolTip="Change these settings only if you know what you're doing."
+                                Height="26" Click="Change_Click">Change</Button>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="About">
+            <StackPanel Orientation="Vertical">
+                <Label>YouCast version 1.6</Label>
+                <Label>Made by Bar Arnon</Label>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</Window>
