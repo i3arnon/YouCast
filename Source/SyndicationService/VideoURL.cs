@@ -16,18 +16,18 @@ namespace SyndicationService
     ///*   fallback_host=tc.v20.cache4.c.youtube.com\u0026
     ///*   quality=hd720
     /// </summary>
-    class VideoURL
+    class VideoUrl
     {
         #region Data Members
 
-        private const int URLRegexGroup = 1;
+        private const int UrlRegexGroup = 1;
         private const int ItagRegexGroup = 2;
         private const int SigRegexGroup = 3;
         private const string MainSplitStr = "\u0026";
-        private const string SigRegex = "(sig|signature)(=|%3D)([0-9a-zA-Z]+\\.[0-9a-zA-Z]+)";
+        private const string SigRegex = "(s|sig|signature)(=|%3D)([0-9a-zA-Z]+\\.[0-9a-zA-Z]+)";
         private const string ItagRegex = "itag(=|%3D)([0-9]+)";
 
-        private readonly string _rawURL;
+        private readonly string _rawUrl;
         private readonly YouTubeEncoding _format = YouTubeEncoding.MP4_360p;
         // The following regexes will be used only if the expected format has changed.
         private readonly String[] _urlRegexes =
@@ -42,10 +42,10 @@ namespace SyndicationService
 
         #region Methods
 
-        public VideoURL(string raw)
+        public VideoUrl(string raw)
         {
-            _rawURL = raw;
-            var splits = _rawURL.Split(new[] {MainSplitStr}, StringSplitOptions.RemoveEmptyEntries);
+            _rawUrl = raw;
+            var splits = _rawUrl.Split(new[] {MainSplitStr}, StringSplitOptions.RemoveEmptyEntries);
             foreach (var currString in splits)
             {
                 var match = Regex.Match(currString, ItagRegex, RegexOptions.IgnoreCase);
@@ -62,10 +62,10 @@ namespace SyndicationService
             return (int)_format;
         }
 
-        internal string GetURL()
+        internal string GetUrl()
         {
             Debug.WriteLine("Cleaning URL.");
-            string[] splits = _rawURL.Split(new[] { MainSplitStr }, StringSplitOptions.RemoveEmptyEntries);
+            string[] splits = _rawUrl.Split(new[] { MainSplitStr }, StringSplitOptions.RemoveEmptyEntries);
             var mainParams = new Dictionary<string, string>();
             foreach (string currString in splits)
             {
@@ -93,10 +93,10 @@ namespace SyndicationService
                 Debug.WriteLine("URL not found. Trying to parse the URL using a regular expression.");
                 for (var i = 0; i < _urlRegexes.Length; i++)
                 {
-                    var match = Regex.Match(_rawURL, _urlRegexes[i], RegexOptions.IgnoreCase);
+                    var match = Regex.Match(_rawUrl, _urlRegexes[i], RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
-                        url = HttpUtility.UrlDecode(match.Groups[URLRegexGroup].Value, Encoding.UTF8);
+                        url = HttpUtility.UrlDecode(match.Groups[UrlRegexGroup].Value, Encoding.UTF8);
                         Debug.WriteLine("Found URL using regex number " + i);
                         break;
                     }
@@ -105,11 +105,11 @@ namespace SyndicationService
 
             if (url != null)
             {
-                url = ValidateParametersInURL(url, mainParams);
+                url = ValidateParametersInUrl(url, mainParams);
             }
             else
             {
-                Debug.WriteLine("Could not find URL in: " + _rawURL);
+                Debug.WriteLine("Could not find URL in: " + _rawUrl);
             }
             return url;
         }
@@ -120,14 +120,14 @@ namespace SyndicationService
             return match.Success ? new[] { match.Groups[1].Value, match.Groups[2].Value } : null;
         }
 
-        private string ValidateParametersInURL(string url, Dictionary<string, string> mainParams)
+        private string ValidateParametersInUrl(string url, Dictionary<string, string> mainParams)
         {
             // check that it contains a signature and an itag
             // 1. signature. Three possible cases:
             // 1.1 url may not contain a signature
             // 1.2 url may contain a signature with the name "sig"
             // 1.3 url may contain a signature with the correct name "signature"
-            if (!url.Contains("signature=") && !url.Contains("sig="))
+            if (!url.Contains("signature=") && !url.Contains("sig=") && !url.Contains("&s="))
             {
                 string sig = null;
                 // Case 1:
@@ -140,17 +140,21 @@ namespace SyndicationService
                 {
                     sig = mainParams["sig"];
                 }
+                else if (mainParams.ContainsKey("s"))
+                {
+                    sig = mainParams["s"];
+                }
                 else
                 {
                     // Fallback to a regex.
-                    var match = Regex.Match(_rawURL, SigRegex, RegexOptions.IgnoreCase);
+                    var match = Regex.Match(_rawUrl, SigRegex, RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
                         sig = match.Groups[SigRegexGroup].Value;
                     }
                     else
                     {
-                        Debug.WriteLine("Could not find signature for URL: " + _rawURL);
+                        Debug.WriteLine("Could not find signature for URL: " + _rawUrl);
                     }
                 }
 
@@ -160,6 +164,11 @@ namespace SyndicationService
             {
                 // Case 2: replace sig with signature
                 url = url.Replace("sig=", "signature=");
+            }
+            else if (url.Contains("&s="))
+            {
+                // Case 2: replace sig with signature
+                url = url.Replace("&s=", "&signature=");
             }
             else
             {
@@ -175,13 +184,17 @@ namespace SyndicationService
                 {
                     sig = mainParams["sig"];
                 }
+                else if (mainParams.ContainsKey("s"))
+                {
+                    sig = mainParams["s"];
+                }
 
                 if (sig != null)
                 {
                     int indexOfSig = url.IndexOf(sig, StringComparison.Ordinal);
                     if (indexOfSig < 0)
                         // mismatch between the signatures
-                        Debug.WriteLine(string.Format("Mismatch between signature {0} and the one in the URL: {1}", sig, url));
+                        Debug.WriteLine("Mismatch between signature {0} and the one in the URL: {1}", sig, url);
                 }
             }
             
@@ -192,7 +205,7 @@ namespace SyndicationService
             {
                 // check that it doesn't conflict with the one in mainParams, if any.
                 if (itag != null && url.IndexOf("itag=" + itag, StringComparison.Ordinal) == -1)
-                    Debug.WriteLine(string.Format("Mismatch between itag {0} and the one in the URL: {1}", itag, url));
+                    Debug.WriteLine("Mismatch between itag {0} and the one in the URL: {1}", itag, url);
             }
             else
             {

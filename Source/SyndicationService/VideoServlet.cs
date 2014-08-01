@@ -10,7 +10,7 @@ namespace SyndicationService
     {
         private readonly HttpClient _client;
         private readonly List<YouTubeEncoding> _encodings = new List<YouTubeEncoding>();
-        public const string VideoURLFormat = "http://www.youtube.com/watch?v={0}";
+        private const string VideoUrlFormat = "http://www.youtube.com/watch?v={0}";
 
         public VideoServlet()
         {
@@ -27,17 +27,17 @@ namespace SyndicationService
             _client = new HttpClient();
         }
 
-        public string GetVideoURL(string videoId, YouTubeEncoding encoding)
+        public string GetVideoUrl(string videoId, YouTubeEncoding encoding)
         {
             return GetVideoLink(
                 _client.GetStringAsync(
-                    new Uri(string.Format(VideoURLFormat, videoId))).Result,
+                    new Uri(string.Format(VideoUrlFormat, videoId))).Result,
                 encoding);
         }
 
         private string GetVideoLink(string content, YouTubeEncoding format)
         {
-            string urlMap = ExtractURLMap(content);
+            string urlMap = ExtractUrlMap(content);
             if (string.IsNullOrWhiteSpace(urlMap))
             {
                 urlMap = content;
@@ -56,29 +56,30 @@ namespace SyndicationService
                 }
             }
 
-            var url = GeURLByEncoding(videoUrls, format);
+            var url = GeUrlByEncoding(videoUrls, format);
             if (url == null)
             {
                 Debug.Fail("Can't find url");
             }
 
-            string cleanURL = url.GetURL();
-            if (string.IsNullOrWhiteSpace(cleanURL))
+            var cleanUrl = url.GetUrl();
+            if (string.IsNullOrWhiteSpace(cleanUrl))
             {
                 Debug.WriteLine("Couldn't parse URL from " + url);
             }
 
-            return cleanURL;
+            return cleanUrl;
         }
-        private static string ExtractURLMap(string content)
+        private static string ExtractUrlMap(string content)
         {
-            int mapStartIndex = content.IndexOf("\"url_encoded_fmt_stream_map\"", StringComparison.Ordinal);
+            const string urlEncodedFmtStreamMap = "\"url_encoded_fmt_stream_map\": \"";
+            int mapStartIndex = content.IndexOf(urlEncodedFmtStreamMap, StringComparison.Ordinal);
             if (mapStartIndex < 0)
             {
                 return string.Empty;
             }
 
-            content = content.Substring(mapStartIndex);
+            content = content.Substring(mapStartIndex + urlEncodedFmtStreamMap.Length);
             int mapEndIndex = content.IndexOf("\",", StringComparison.Ordinal);
             if (mapEndIndex > 0)
             {
@@ -87,7 +88,7 @@ namespace SyndicationService
             return content.Replace("\\u0026", "&");
         }
         
-        private static VideoURL[] ParseUrls(string urlMap)
+        private static VideoUrl[] ParseUrls(string urlMap)
         {
             string[] rawUrls = urlMap.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (rawUrls.Length == 1)
@@ -138,18 +139,18 @@ namespace SyndicationService
                 }
             }
 
-            var videoUrLs = new VideoURL[rawUrls.Length];
+            var videoUrLs = new VideoUrl[rawUrls.Length];
             for (int i = 0; i < videoUrLs.Length; i++)
-            videoUrLs[i] = new VideoURL(rawUrls[i]);
+            videoUrLs[i] = new VideoUrl(rawUrls[i]);
 
             Debug.WriteLine("Found download URLs: " + videoUrLs.Length);
             
             return videoUrLs;
         }
 
-        private VideoURL GeURLByEncoding(VideoURL[] urls, YouTubeEncoding encoding)
+        private VideoUrl GeUrlByEncoding(VideoUrl[] urls, YouTubeEncoding encoding)
         {
-            VideoURL url = null;
+            VideoUrl url = null;
             int index = _encodings.IndexOf(encoding);
 
             while (url == null && index >= 0)
@@ -161,10 +162,10 @@ namespace SyndicationService
 
             return url;
         }
-        private VideoURL getVideoURLWithFormat(VideoURL[] urls, YouTubeEncoding encoding)
+        private VideoUrl getVideoURLWithFormat(IList<VideoUrl> urls, YouTubeEncoding encoding)
         {
-            VideoURL url = null;
-            for (int i = 0; i < urls.Length; i++)
+            VideoUrl url = null;
+            for (int i = 0; i < urls.Count; i++)
             {
                 int fmt = urls[i].GetFormat();
                 if (fmt == (int)encoding)

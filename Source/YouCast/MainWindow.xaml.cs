@@ -89,13 +89,13 @@ namespace YouCast
                 maxLength = 0;
             }
 
-            string url = GenerateURL(userId, encoding, maxLength, isPopular);
+            string url = GenerateUrl(userId, encoding, maxLength, isPopular);
             
             Output.Text = url;
             Clipboard.SetText(url);
         }
 
-        private string GenerateURL(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular)
+        private string GenerateUrl(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular)
         {
             var selectedItem = ComboBox.SelectedItem as ListBoxItem;
             if (Equals(selectedItem, UserNameItem))

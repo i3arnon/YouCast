@@ -25,9 +25,9 @@ namespace SyndicationService
     {
         #region Data Members
 
-        private const string UserURL = "http://gdata.youtube.com/feeds/api/users/{0}";
-        private const string PlaylistURL = "https://gdata.youtube.com/feeds/api/playlists/{0}?v=2";
-        private const string VideoURL = "http://www.youtube.com/watch?v={0}";
+        private const string UserUrl = "http://gdata.youtube.com/feeds/api/users/{0}";
+        private const string PlaylistUrl = "https://gdata.youtube.com/feeds/api/playlists/{0}?v=2";
+        private const string VideoUrl = "http://www.youtube.com/watch?v={0}";
         private const string DeveloperKey ="AI39si6kaGnRDF4m-BzWNLIfrVP5O0MNS2Up5dfEpy0PnOZ9vhsI6Ro1wLOWhIPohT0CdZa_WiWBRzZCMJ8INxXT_0pyRPOmBA";
 
         private readonly YouTubeService _service = new YouTubeService(GeneralInformation.ApplicationName, DeveloperKey);
@@ -48,7 +48,7 @@ namespace SyndicationService
             SetBaseAddress();
             
             var youtubeEncoding = ParseEncoding(encoding);
-            var profile = _service.Get(string.Format(UserURL, userId)) as ProfileEntry;
+            var profile = _service.Get(string.Format(UserUrl, userId)) as ProfileEntry;
             var lastUpdated = profile.Updated;
 
             SyndicationFeed syndicationFeed;
@@ -92,7 +92,7 @@ namespace SyndicationService
 
             SyndicationFeed syndicationFeed;
             var request = new YouTubeRequest(GetRequestSettings(maxLength));
-            var playlist = request.Get<PlayListMember>(new Uri(string.Format(PlaylistURL, playlistId)));
+            var playlist = request.Get<PlayListMember>(new Uri(string.Format(PlaylistUrl, playlistId)));
             var lastUpdated = playlist.AtomFeed.Updated;
             var key = playlistId + encoding + maxLength;
 
@@ -118,12 +118,12 @@ namespace SyndicationService
 
         public void GetVideo(string videoId, string encoding)
         {
-            var videoURL = _videoServlet.GetVideoURL(videoId, ParseEncoding(encoding));
+            var videoUrl = _videoServlet.GetVideoUrl(videoId, ParseEncoding(encoding));
 
-            Debug.WriteLine("final video url: " + videoURL);
+            Debug.WriteLine("final video url: " + videoUrl);
 
             WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = videoURL;
+            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = videoUrl;
         }
 
         public Stream ExtractMp3Audio(string videoId, string encoding)
@@ -189,7 +189,7 @@ namespace SyndicationService
             }
 
             var audioType = youtubeEncoding == YouTubeEncoding.MP3_Best ? AudioType.Mp3 : AudioType.Aac;
-            VideoInfo video = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoURL, videoId))
+            VideoInfo video = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrl, videoId))
                 .Where(info => info.CanExtractAudio && info.AudioType == audioType)
                 .OrderByDescending(info => info.AudioBitrate)
                 .First();
