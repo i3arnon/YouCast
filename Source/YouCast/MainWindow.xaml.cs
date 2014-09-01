@@ -92,7 +92,7 @@ namespace YouCast
             string url = GenerateUrl(userId, encoding, maxLength, isPopular);
             
             Output.Text = url;
-            Clipboard.SetText(url);
+            Clipboard.SetDataObject(url);
         }
 
         private string GenerateUrl(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular)
@@ -123,7 +123,7 @@ namespace YouCast
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetText(Output.Text);
+            Clipboard.SetDataObject(Output.Text);
         }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)

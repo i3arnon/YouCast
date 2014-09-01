@@ -6,7 +6,11 @@
         StateChanged="Window_StateChanged_1"
         FontFamily="tahoma"
         FontSize="13"
-        Title="YouCast" Height="295" Width="463" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+        Title="YouCast" 
+        Height="295" 
+        Width="463" 
+        ResizeMode="CanMinimize" 
+        WindowStartupLocation="CenterScreen">
     <TabControl>
         <TabItem Header="Podcast">
                 <StackPanel>
