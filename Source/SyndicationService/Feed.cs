@@ -33,6 +33,8 @@ namespace SyndicationService
 
         private readonly YouTubeService _service = new YouTubeService(GeneralInformation.ApplicationName, DeveloperKey);
 
+
+
         private string _baseAddress;
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using SyndicationService;
+﻿using Service;
+using SyndicationService;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -183,7 +184,7 @@ namespace YouCast
         private void OpenService()
         {
             var baseAddress = new Uri(_baseAddress);
-            var svcHost = new WebServiceHost(typeof(Feed), baseAddress);
+            var svcHost = new WebServiceHost(typeof(YoutubeFeed), baseAddress);
 
             try
             {

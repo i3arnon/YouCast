@@ -1,24 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.20212</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AF3F90DE-6C83-4C48-A4C5-2310E4383808}</ProjectGuid>
+    <ProjectGuid>{9D512757-C17F-45AA-B0F0-5702AEB7A437}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SyndicationService</RootNamespace>
-    <AssemblyName>SyndicationService</AssemblyName>
+    <RootNamespace>Service</RootNamespace>
+    <AssemblyName>Service</AssemblyName>
     <ProjectTypeGuids>{3D9AD99F-2412-4246-B90B-4EAA41C64699};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <StartArguments>"/client:iexplore.exe" "/clientArgs:http://localhost:8733/Design_Time_Addresses/SyndicationService/Feed1/"</StartArguments>
+    <StartArguments>"/client:iexplore.exe" "/clientArgs:http://localhost:8733/Design_Time_Addresses/Service/Feed1/"</StartArguments>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -58,18 +54,6 @@
     <Reference Include="Google.Apis.YouTube.v3">
       <HintPath>..\packages\Google.Apis.YouTube.v3.1.8.1.1160\lib\portable-net4+sl4+wp71+win8\Google.Apis.YouTube.v3.dll</HintPath>
     </Reference>
-    <Reference Include="Google.GData.Client, Version=2.1.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Google\Google YouTube SDK for .NET\Redist\Google.GData.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.GData.Extensions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=0b4c5df2ebf20876, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Google\Google YouTube SDK for .NET\Redist\Google.GData.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.GData.YouTube, Version=2.1.0.0, Culture=neutral, PublicKeyToken=af04a32718ae8833, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Google\Google YouTube SDK for .NET\Samples\Google.GData.YouTube.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -79,6 +63,9 @@
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks.Extensions">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.16\lib\net45\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="MoreLinq">
+      <HintPath>..\packages\morelinq.2.0.0-alpha01\lib\net35\MoreLinq.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -96,15 +83,12 @@
       <HintPath>..\packages\Microsoft.Net.Http.2.1.10\lib\net45\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="YoutubeExtractor, Version=0.10.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="YoutubeExtractor">
       <HintPath>..\packages\YoutubeExtractor.0.10.4.1\lib\net35\YoutubeExtractor.dll</HintPath>
     </Reference>
     <Reference Include="Zlib.Portable">
@@ -112,12 +96,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GeneralInformation.cs" />
     <Compile Include="ItunesFeed.cs" />
-    <Compile Include="Feed.cs" />
-    <Compile Include="IFeed.cs" />
+    <Compile Include="YoutubeFeed.cs" />
+    <Compile Include="ISyndicationFeed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="YouTubeEncoding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
