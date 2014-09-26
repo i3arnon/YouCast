@@ -19,11 +19,6 @@ namespace SyndicationService
             _encodings.Add(YouTubeEncoding.MP4_1080p);
             _encodings.Add(YouTubeEncoding.MP4_3072p);
 
-            _encodings.Add(YouTubeEncoding.MP4_240p_3D);
-            _encodings.Add(YouTubeEncoding.MP4_360p_3D);
-            _encodings.Add(YouTubeEncoding.MP4_520p_3D);
-            _encodings.Add(YouTubeEncoding.MP4_720p_3D);
-
             _client = new HttpClient();
         }
 

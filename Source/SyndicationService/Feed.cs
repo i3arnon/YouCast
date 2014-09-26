@@ -118,7 +118,18 @@ namespace SyndicationService
 
         public void GetVideo(string videoId, string encoding)
         {
-            var videoUrl = _videoServlet.GetVideoUrl(videoId, ParseEncoding(encoding));
+            IEnumerable<VideoInfo> videoInfos = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrl, videoId), false);
+            var resoultion = int.Parse(ParseEncoding(encoding).ToString().Substring(4,3));
+            var orderedVideos = videoInfos.Where(_ => _.VideoType == VideoType.Mp4).OrderByDescending(_ => _.Resolution).ToList();
+            var video = orderedVideos.FirstOrDefault(_ => _.Resolution == resoultion) ?? orderedVideos.First();
+
+            if (video.RequiresDecryption)
+            {
+                DownloadUrlResolver.DecryptDownloadUrl(video);
+            }
+
+            var videoUrl = video.DownloadUrl;
+            //var videoUrl = _videoServlet.GetVideoUrl(videoId, ParseEncoding(encoding));
 
             Debug.WriteLine("final video url: " + videoUrl);
 
@@ -338,10 +349,6 @@ namespace SyndicationService
                 case YouTubeEncoding.MP4_720p:
                 case YouTubeEncoding.MP4_1080p:
                 case YouTubeEncoding.MP4_3072p:
-                case YouTubeEncoding.MP4_360p_3D:
-                case YouTubeEncoding.MP4_240p_3D:
-                case YouTubeEncoding.MP4_720p_3D:
-                case YouTubeEncoding.MP4_520p_3D:
                     mediaType = "video/mp4";
                     break;
                 case YouTubeEncoding.MP3_Best:
@@ -375,10 +382,6 @@ namespace SyndicationService
                 case YouTubeEncoding.MP4_720p:
                 case YouTubeEncoding.MP4_1080p:
                 case YouTubeEncoding.MP4_3072p:
-                case YouTubeEncoding.MP4_360p_3D:
-                case YouTubeEncoding.MP4_240p_3D:
-                case YouTubeEncoding.MP4_720p_3D:
-                case YouTubeEncoding.MP4_520p_3D:
                     fileName = "Video.mp4";
                     break;
                 case YouTubeEncoding.AAC_Best:
