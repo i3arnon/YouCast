@@ -27,7 +27,9 @@ namespace SyndicationService
         private const string UserUrl = "http://gdata.youtube.com/feeds/api/users/{0}";
         private const string PlaylistUrl = "https://gdata.youtube.com/feeds/api/playlists/{0}?v=2";
         private const string VideoUrl = "http://www.youtube.com/watch?v={0}";
-        private const string DeveloperKey ="AI39si6kaGnRDF4m-BzWNLIfrVP5O0MNS2Up5dfEpy0PnOZ9vhsI6Ro1wLOWhIPohT0CdZa_WiWBRzZCMJ8INxXT_0pyRPOmBA";
+
+        private const string DeveloperKey =
+            "AI39si6kaGnRDF4m-BzWNLIfrVP5O0MNS2Up5dfEpy0PnOZ9vhsI6Ro1wLOWhIPohT0CdZa_WiWBRzZCMJ8INxXT_0pyRPOmBA";
 
         private readonly YouTubeService _service = new YouTubeService(GeneralInformation.ApplicationName, DeveloperKey);
 
@@ -40,7 +42,7 @@ namespace SyndicationService
         public SyndicationFeedFormatter GetUserFeed(string userId, string encoding, int maxLength, bool isPopular)
         {
             SetBaseAddress();
-            
+
             var youtubeEncoding = ParseEncoding(encoding);
             var profile = _service.Get(string.Format(UserUrl, userId)) as ProfileEntry;
             var lastUpdated = profile.Updated;
@@ -56,7 +58,7 @@ namespace SyndicationService
             {
                 MemoryCache.Default.Remove(key);
 
-                syndicationFeed = CreateSyndicationFeed(profile, youtubeEncoding, isPopular);
+                syndicationFeed = CreateSyndicationFeed(profile, isPopular);
                 var syndicationItems = GetVideos(userId, youtubeEncoding, maxLength, isPopular).ToList();
                 if (isPopular)
                 {
@@ -79,7 +81,8 @@ namespace SyndicationService
             return GetFormatter(syndicationFeed);
         }
 
-        public SyndicationFeedFormatter GetPlaylistFeed(string playlistId, string encoding, int maxLength, bool isPopular)
+        public SyndicationFeedFormatter GetPlaylistFeed(string playlistId, string encoding, int maxLength,
+            bool isPopular)
         {
             SetBaseAddress();
             var youtubeEncoding = ParseEncoding(encoding);
@@ -157,37 +160,27 @@ namespace SyndicationService
             // Return ATOM or RSS based on query string
             // rss -> http://localhost:8733/Design_Time_Addresses/SyndicationService/Feed1/
             // atom -> http://localhost:8733/Design_Time_Addresses/SyndicationService/Feed1/?format=atom
-            string query = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["format"];
-            SyndicationFeedFormatter formatter;
-            if (query == "atom")
-            {
-                formatter = new Atom10FeedFormatter(syndicationFeed);
-            }
-            else
-            {
-                formatter = new Rss20FeedFormatter(syndicationFeed);
-            }
-            return formatter;
+            var query = WebOperationContext.Current.IncomingRequest.UriTemplateMatch.QueryParameters["format"];
+            return query == "atom"
+                ? (SyndicationFeedFormatter) new Atom10FeedFormatter(syndicationFeed)
+                : new Rss20FeedFormatter(syndicationFeed);
         }
 
-        private SyndicationFeed CreatePlaylistFeed(Feed<PlayListMember> playlist, YouTubeEncoding encoding, bool isPopular)
+        private SyndicationFeed CreatePlaylistFeed(Feed<PlayListMember> playlist, YouTubeEncoding encoding,
+            bool isPopular)
         {
-            var link = playlist.AtomFeed.Links.FirstOrDefault(l => l.Rel == "alternate");
-
-            var popular = isPopular ? " (By Popularity)" : string.Empty;
-
             var syndicationFeed = new ItunesFeed(
-                playlist.AtomFeed.Title.Text + popular,
+                playlist.AtomFeed.Title.Text + (isPopular ? " (By Popularity)" : string.Empty),
                 playlist.AtomFeed.Subtitle.Text,
-                new Uri(link.HRef.Content))
+                new Uri(playlist.AtomFeed.Links.FirstOrDefault(l => l.Rel == "alternate").HRef.Content))
             {
                 ImageUrl = new Uri(playlist.AtomFeed.Logo.Uri.Content)
             };
 
-            var videos = playlist.Entries;
+            var videos = playlist.Entries.ToList();
             if (isPopular)
             {
-                videos = videos.OrderByDescending(video => video.ViewCount);
+                videos = videos.OrderByDescending(video => video.ViewCount).ToList();
             }
             var firstDate = videos.First().YouTubeEntry.Published;
             var items = videos.Select(playlistMember => CreateItem(playlistMember, encoding)).ToList();
@@ -199,40 +192,33 @@ namespace SyndicationService
             return syndicationFeed;
         }
 
-        private static ItunesFeed CreateSyndicationFeed(ProfileEntry profile, YouTubeEncoding encoding, bool isPopular)
+        private static ItunesFeed CreateSyndicationFeed(ProfileEntry profile, bool isPopular)
         {
-            var link = profile.Links.FirstOrDefault(l => l.Rel == "alternate");
-
-            var popular = isPopular ? " (By Popularity)" : string.Empty;
             var title = Regex.IsMatch(profile.Title.Text.Substring(0, 1), "[a-z]|[A-Z]")
                 ? profile.Title.Text
                 : profile.UserName;
             var feed = new ItunesFeed(
-                title + popular,
+                title + (isPopular ? " (By Popularity)" : string.Empty),
                 GetSummary(profile),
-                new Uri(link.HRef.Content));
+                new Uri(profile.Links.FirstOrDefault(l => l.Rel == "alternate").HRef.Content));
+            var thumbnail = profile.ExtensionElements.Where(e => e.XmlName == "thumbnail").
+                Cast<XmlExtension>().
+                SingleOrDefault();
+            if (thumbnail != null)
+            {
+                feed.ImageUrl = new Uri(thumbnail.Node.Attributes["url"].Value.Replace("https://", "http://"));
+            }
 
-            var thumbnail = (from e in profile.ExtensionElements
-                where e.XmlName == "thumbnail"
-                select (XmlExtension) e).SingleOrDefault();
-            if (thumbnail == null) return feed;
-            var thumbnailUrl = thumbnail.Node.Attributes["url"].Value.Replace("https://", "http://");
-            feed.ImageUrl = new Uri(thumbnailUrl);
             return feed;
         }
 
         private static string GetSummary(AtomEntry profile)
         {
-            string title = profile.Summary.Text;
+            var title = profile.Summary.Text;
             if (title.Length < 1) return title;
 
-            title = title.Substring(0, 1);
-            if (Regex.IsMatch(title, "[a-z]|[A-Z]"))
-            {
-                // Assumes its english
-                return profile.Summary.Text;
-            }
-            return string.Empty;
+            // Assume it's english
+            return Regex.IsMatch(title.Substring(0, 1), "[a-z]|[A-Z]") ? profile.Summary.Text : string.Empty;
         }
 
         private static YouTubeRequestSettings GetRequestSettings(int maxLength)
@@ -240,22 +226,25 @@ namespace SyndicationService
             var settings = new YouTubeRequestSettings(
                 GeneralInformation.ApplicationName,
                 DeveloperKey)
-                {
-                    PageSize = 50,
-                    UseSSL = false,
-                    AutoPaging = true
-                };
-            if (maxLength <= 0) return settings;
-
-            if (maxLength < settings.PageSize)
             {
-                settings.PageSize = maxLength;
+                PageSize = 50,
+                UseSSL = false,
+                AutoPaging = true
+            };
+            if (maxLength > 0)
+            {
+                if (maxLength < settings.PageSize)
+                {
+                    settings.PageSize = maxLength;
+                }
+                settings.Maximum = maxLength;
             }
-            settings.Maximum = maxLength;
+
             return settings;
         }
 
-        private IEnumerable<SyndicationItem> GetVideos(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular)
+        private IEnumerable<SyndicationItem> GetVideos(string userId, YouTubeEncoding encoding, int maxLength,
+            bool isPopular)
         {
             var videos = new YouTubeRequest(GetRequestSettings(maxLength)).GetVideoFeed(userId).Entries;
             if (isPopular)
@@ -267,27 +256,24 @@ namespace SyndicationService
 
         private SyndicationItem CreateItem(Video video, YouTubeEncoding encoding)
         {
-            var item = new SyndicationItem(
-                video.Title,
-                string.Empty,
-                video.WatchPage)
+            var item = new SyndicationItem(video.Title, string.Empty, video.WatchPage)
             {
                 Id = video.Id,
                 PublishDate = video.YouTubeEntry.Published,
                 Summary = new TextSyndicationContent(video.Summary)
             };
-
-            var categories = video.Categories.Where(c =>
-                c.Scheme.Content.ToLower().Contains("categories"));
-            foreach (var category in categories)
+            foreach (var category in video.Categories.Where(_ => _.Scheme.Content.ToLower().Contains("categories")))
             {
                 item.Categories.Add(new SyndicationCategory(category.Term));
             }
 
             item.ElementExtensions.Add(
-                    new XElement("enclosure",
-                        new XAttribute("type", "video/mp4"),
-                        new XAttribute("url", _baseAddress + string.Format("/{0}?videoId={1}&encoding={2}", "Video.mp4", video.VideoId, encoding))).CreateReader());
+                new XElement("enclosure",
+                    new XAttribute("type", "video/mp4"),
+                    new XAttribute("url",
+                        _baseAddress +
+                        string.Format("/{0}?videoId={1}&encoding={2}", "Video.mp4", video.VideoId, encoding)))
+                    .CreateReader());
             item.ElementExtensions.Add(new XElement("description", video.Description));
             return item;
         }
@@ -295,7 +281,8 @@ namespace SyndicationService
         private void SetBaseAddress()
         {
             var transportAddress = OperationContext.Current.IncomingMessageProperties.Via;
-            _baseAddress = string.Format("http://{0}:{1}/FeedService", transportAddress.DnsSafeHost, transportAddress.Port);
+            _baseAddress = string.Format("http://{0}:{1}/FeedService", transportAddress.DnsSafeHost,
+                transportAddress.Port);
         }
 
         #endregion
