@@ -15,9 +15,7 @@ YouCast allows you to subscribe to video feeds on YouTube as podcasts in any sta
 3. Sort the videos by popularity (awesome for huge channels, like TED Talks)
 4. Run YouCast at home and access it from everywhere on the internet, not just your home network.
 5. Limit the amount of videos in any feed (helps with users with thousands of videos).
-6. Extract the audio from a feed, in MP3 or AAC. (Works on iTunes & MediaMonkey, maybe more...)
-7. Use YouCast from any device in your network: iPhone, Android, Tablet. (Just open the incoming port 22703 on your firewall and paste the URL in your favorite podcatcher)
-8. Use the ClickOnce installer to automate the update process.
+6. Use YouCast from any device in your network: iPhone, Android, Tablet. (Just open the incoming port 22703 on your firewall and paste the URL in your favorite podcatcher)
 
 # Usage
 To get a URL for the specific podcast:
@@ -33,4 +31,4 @@ To get a URL for the specific podcast:
 The software requires the following:
 
 1. Administrative privileges
-2. .Net Framework 3.5 or higher.
+2. .Net Framework 4.0 or higher.
