@@ -158,9 +158,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SyndicationService\SyndicationService.csproj">
       <Project>{af3f90de-6c83-4c48-a4c5-2310e4383808}</Project>
       <Name>SyndicationService</Name>

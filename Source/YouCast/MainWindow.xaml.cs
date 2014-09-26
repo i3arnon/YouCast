@@ -318,5 +318,20 @@ namespace YouCast
                 : WindowState.Normal;
             Settings.Default.Save();
         }
+
+        private void YoucastLink_OnClick(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://github.com/I3arnon/YouCast");
+        }
+
+        private void TwitterLink_OnClick(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://twitter.com/BarArnon");
+        }
+
+        private void GplLink_OnClick(object sender, RoutedEventArgs e)
+        {
+            Process.Start("https://github.com/I3arnon/YouCast/blob/master/LICENSE");
+        }
     }
 }

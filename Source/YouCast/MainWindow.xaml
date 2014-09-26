@@ -108,8 +108,24 @@
         </TabItem>
         <TabItem Header="About">
             <StackPanel Orientation="Vertical">
-                <Label>YouCast version 1.6</Label>
-                <Label>Made by Bar Arnon</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Image HorizontalAlignment="Left" Source="rss.ico" Height="90"></Image>
+                    <Button 
+                        Name="YoucastLink" 
+                        Style="{StaticResource LinkButton}"  
+                        Click="YoucastLink_OnClick">YouCast v2.0.</Button>
+                    <Label VerticalAlignment="Center">Made by</Label>
+                    <Button 
+                        Name="TwitterLink" 
+                        Style="{StaticResource LinkButton}"  
+                        Click="TwitterLink_OnClick">@BarArnon</Button>
+                    <Label VerticalAlignment="Center">under the </Label>
+                    <Button 
+                        Name="GplLink" 
+                        Style="{StaticResource LinkButton}"  
+                        Click="GplLink_OnClick">GPLv2</Button>
+                    <Label VerticalAlignment="Center">license.</Label>
+                </StackPanel>
             </StackPanel>
         </TabItem>
     </TabControl>
