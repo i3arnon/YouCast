@@ -63,7 +63,6 @@ namespace YouCast
         private static void RunApplication()
         {
             var application = new App();
-
             application.InitializeComponent();
             application.Run();
         }

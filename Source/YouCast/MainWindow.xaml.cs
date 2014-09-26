@@ -128,6 +128,13 @@ namespace YouCast
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
+            WindowState = Settings.Default.StartupWindowState;
+            if (Settings.Default.StartupWindowState == WindowState.Minimized)
+            {
+                Window_StateChanged_1(null, EventArgs.Empty);
+                StartMinimized.IsChecked = true;
+            }
+
             AddFirewallRule();
             OpenService();
         }
@@ -296,6 +303,19 @@ namespace YouCast
             Settings.Default.HostName = host;
             Settings.Default.PortNumber = port;
             Settings.Default.OverrideNetworkSettings = true;
+            Settings.Default.Save();
+        }
+
+        private void Save_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!StartMinimized.IsChecked.HasValue)
+            {
+                return;
+            }
+
+            Settings.Default.StartupWindowState = StartMinimized.IsChecked.Value
+                ? WindowState.Minimized
+                : WindowState.Normal;
             Settings.Default.Save();
         }
     }

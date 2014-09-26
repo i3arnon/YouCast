@@ -88,6 +88,22 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <Label>Configurations</Label>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <DockPanel>
+                            <CheckBox Name="StartMinimized" DockPanel.Dock="Right">Start Minimized</CheckBox>
+                        </DockPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button 
+                                x:Name="Save" 
+                                Margin="5,5,5,5"
+                                Height="26" Click="Save_OnClick">Save</Button>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </TabItem>
         <TabItem Header="About">
