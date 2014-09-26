@@ -21,13 +21,5 @@ namespace SyndicationService
         [OperationContract]
         [WebGet(UriTemplate = "Video.mp4?videoId={videoId}&encoding={encoding}")]
         void GetVideo(string videoId, string encoding);
-
-        [OperationContract]
-        [WebGet(UriTemplate = GeneralInformation.ApplicationName + ".mp3?videoId={videoId}&encoding={encoding}")]
-        Stream ExtractMp3Audio(string videoId, string encoding);
-
-        [OperationContract]
-        [WebGet(UriTemplate = GeneralInformation.ApplicationName + ".aac?videoId={videoId}&encoding={encoding}")]
-        Stream ExtractAacAudio(string videoId, string encoding);
     }
 }

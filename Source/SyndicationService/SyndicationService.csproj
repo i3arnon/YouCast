@@ -77,8 +77,6 @@
     <Compile Include="Feed.cs" />
     <Compile Include="IFeed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VideoServlet.cs" />
-    <Compile Include="VideoURL.cs" />
     <Compile Include="YouTubeEncoding.cs" />
   </ItemGroup>
   <ItemGroup>

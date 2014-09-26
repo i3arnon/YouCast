@@ -5,7 +5,6 @@ using Google.YouTube;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Caching;
@@ -31,13 +30,8 @@ namespace SyndicationService
         private const string DeveloperKey ="AI39si6kaGnRDF4m-BzWNLIfrVP5O0MNS2Up5dfEpy0PnOZ9vhsI6Ro1wLOWhIPohT0CdZa_WiWBRzZCMJ8INxXT_0pyRPOmBA";
 
         private readonly YouTubeService _service = new YouTubeService(GeneralInformation.ApplicationName, DeveloperKey);
-        private readonly VideoServlet _videoServlet = new VideoServlet();
 
         private string _baseAddress;
-
-        #endregion
-
-        #region Constructors
 
         #endregion
 
@@ -118,33 +112,19 @@ namespace SyndicationService
 
         public void GetVideo(string videoId, string encoding)
         {
-            IEnumerable<VideoInfo> videoInfos = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrl, videoId), false);
-            var resoultion = int.Parse(ParseEncoding(encoding).ToString().Substring(4,3));
-            var orderedVideos = videoInfos.Where(_ => _.VideoType == VideoType.Mp4).OrderByDescending(_ => _.Resolution).ToList();
+            var resoultion = int.Parse(ParseEncoding(encoding).ToString().Substring(4).Replace("p", string.Empty));
+            var orderedVideos = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrl, videoId), false).
+                Where(_ => _.VideoType == VideoType.Mp4).OrderByDescending(_ => _.Resolution).
+                ToList();
             var video = orderedVideos.FirstOrDefault(_ => _.Resolution == resoultion) ?? orderedVideos.First();
-
             if (video.RequiresDecryption)
             {
                 DownloadUrlResolver.DecryptDownloadUrl(video);
             }
 
-            var videoUrl = video.DownloadUrl;
-            //var videoUrl = _videoServlet.GetVideoUrl(videoId, ParseEncoding(encoding));
-
-            Debug.WriteLine("final video url: " + videoUrl);
-
+            Debug.WriteLine("final video url: " + video.DownloadUrl);
             WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = videoUrl;
-        }
-
-        public Stream ExtractMp3Audio(string videoId, string encoding)
-        {
-            return ExtractAudio(videoId, encoding);
-        }
-
-        public Stream ExtractAacAudio(string videoId, string encoding)
-        {
-            return ExtractAudio(videoId, encoding);
+            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = video.DownloadUrl;
         }
 
         #endregion
@@ -190,46 +170,14 @@ namespace SyndicationService
             return formatter;
         }
 
-        private static Stream ExtractAudio(string videoId, string encoding)
-        {
-            var youtubeEncoding = ParseEncoding(encoding);
-            if (!IsAudio(youtubeEncoding))
-            {
-                Debug.WriteLine("Extract audio. Wrong encoding");
-                return null;
-            }
-
-            var audioType = youtubeEncoding == YouTubeEncoding.MP3_Best ? AudioType.Mp3 : AudioType.Aac;
-            VideoInfo video = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrl, videoId))
-                .Where(info => info.CanExtractAudio && info.AudioType == audioType)
-                .OrderByDescending(info => info.AudioBitrate)
-                .First();
-
-            var tempPath = Path.GetTempFileName();
-            FileStream stream = null;
-            try
-            {
-                new AudioDownloader(video, tempPath).Execute();
-                stream = File.OpenRead(tempPath);
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-
-            return stream;
-        }
-
         private SyndicationFeed CreatePlaylistFeed(Feed<PlayListMember> playlist, YouTubeEncoding encoding, bool isPopular)
         {
             var link = playlist.AtomFeed.Links.FirstOrDefault(l => l.Rel == "alternate");
 
-            var audio = IsAudio(encoding) ? " (Audio)" : string.Empty;
             var popular = isPopular ? " (By Popularity)" : string.Empty;
 
             var syndicationFeed = new ItunesFeed(
-                playlist.AtomFeed.Title.Text + audio + popular,
+                playlist.AtomFeed.Title.Text + popular,
                 playlist.AtomFeed.Subtitle.Text,
                 new Uri(link.HRef.Content))
             {
@@ -251,22 +199,16 @@ namespace SyndicationService
             return syndicationFeed;
         }
 
-        private static bool IsAudio(YouTubeEncoding encoding)
-        {
-            return (encoding == YouTubeEncoding.AAC_Best || encoding == YouTubeEncoding.MP3_Best);
-        }
-
         private static ItunesFeed CreateSyndicationFeed(ProfileEntry profile, YouTubeEncoding encoding, bool isPopular)
         {
             var link = profile.Links.FirstOrDefault(l => l.Rel == "alternate");
 
-            var audio = IsAudio(encoding) ? " (Audio)" : string.Empty;
             var popular = isPopular ? " (By Popularity)" : string.Empty;
             var title = Regex.IsMatch(profile.Title.Text.Substring(0, 1), "[a-z]|[A-Z]")
                 ? profile.Title.Text
                 : profile.UserName;
             var feed = new ItunesFeed(
-                title + audio + popular,
+                title + popular,
                 GetSummary(profile),
                 new Uri(link.HRef.Content));
 
@@ -342,27 +284,10 @@ namespace SyndicationService
                 item.Categories.Add(new SyndicationCategory(category.Term));
             }
 
-            var mediaType = string.Empty;
-            switch (encoding)
-            {
-                case YouTubeEncoding.MP4_360p:
-                case YouTubeEncoding.MP4_720p:
-                case YouTubeEncoding.MP4_1080p:
-                case YouTubeEncoding.MP4_3072p:
-                    mediaType = "video/mp4";
-                    break;
-                case YouTubeEncoding.MP3_Best:
-                    mediaType = "audio/mp3";
-                    break;
-                case YouTubeEncoding.AAC_Best:
-                    mediaType = "audio/aac";
-                    break;
-            }
-                
             item.ElementExtensions.Add(
                     new XElement("enclosure",
-                        new XAttribute("type", mediaType),
-                        new XAttribute("url", CreateProxyURL(video.VideoId, encoding))).CreateReader());
+                        new XAttribute("type", "video/mp4"),
+                        new XAttribute("url", _baseAddress + string.Format("/{0}?videoId={1}&encoding={2}", "Video.mp4", video.VideoId, encoding))).CreateReader());
             item.ElementExtensions.Add(new XElement("description", video.Description));
             return item;
         }
@@ -371,28 +296,6 @@ namespace SyndicationService
         {
             var transportAddress = OperationContext.Current.IncomingMessageProperties.Via;
             _baseAddress = string.Format("http://{0}:{1}/FeedService", transportAddress.DnsSafeHost, transportAddress.Port);
-        }
-
-        private string CreateProxyURL(string videoId, YouTubeEncoding encoding)
-        {
-            var fileName = string.Empty;
-            switch (encoding)
-            {
-                case YouTubeEncoding.MP4_360p:
-                case YouTubeEncoding.MP4_720p:
-                case YouTubeEncoding.MP4_1080p:
-                case YouTubeEncoding.MP4_3072p:
-                    fileName = "Video.mp4";
-                    break;
-                case YouTubeEncoding.AAC_Best:
-                    fileName = GeneralInformation.ApplicationName+ ".aac";
-                    break;
-                case YouTubeEncoding.MP3_Best:
-                    fileName = GeneralInformation.ApplicationName + ".mp3";
-                    break;
-            }
-
-            return _baseAddress + string.Format("/{0}?videoId={1}&encoding={2}", fileName, videoId, encoding);
         }
 
         #endregion
