@@ -1,7 +1,7 @@
 YouCast
 =======
 
-YouCast allows you to subscribe to video feeds on YouTube as podcasts in any standard podcatcher like iTunes, BeyondPod on Adroid or even Zune PC and so forth. You can sort videos by popularity and if you only want to listen to the videos YouCast can create an audio feed too, Just select MP3 or AAC as the quality.
+YouCast allows you to subscribe to video feeds on YouTube as podcasts in any standard podcatcher like iTunes, BeyondPod on Adroid or even Zune PC and so forth. You can also sort videos by popularity for these channels you know you will never finish.
 
 [Also on CodePlex](https://youcast.codeplex.com/)
 
