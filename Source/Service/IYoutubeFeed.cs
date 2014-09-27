@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 namespace Service
 {
     [ServiceContract(SessionMode = SessionMode.NotAllowed)]
-    [ServiceKnownType(typeof(Atom10FeedFormatter))]
     [ServiceKnownType(typeof(Rss20FeedFormatter))]
     public interface IYoutubeFeed
     {
