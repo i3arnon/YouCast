@@ -156,25 +156,23 @@ namespace Service
             return userVideos;
         }
 
-        private async Task<IEnumerable<SyndicationItem>> SortByPopularityAsync(
-            IEnumerable<SyndicationItem> userVideos,
-            IEnumerable<PlaylistItem> playlistItems,
-            DateTime startDate)
+        private async Task<IEnumerable<PlaylistItem>> GetPlaylistItemsAsync(Arguments arguments)
         {
-            var videos = await GetVideosAsync(playlistItems.Select(_ => _.Snippet.ResourceId.VideoId).Distinct());
-            var videoDictionary = videos.ToDictionary(_ => _.Id, _ => _);
-            userVideos = userVideos.
-                OrderByDescending(_ => videoDictionary[_.Id].Statistics.ViewCount.GetValueOrDefault()).
-                ToList();
-            var i = 0;
-            foreach (var userVideo in userVideos)
+            var playlistItems = new List<PlaylistItem>();
+            var nextPageToken = string.Empty;
+            while (nextPageToken != null && playlistItems.Count < arguments.MaxLength)
             {
-                userVideo.PublishDate = startDate.AddDays(i);
-                i++;
-                userVideo.Title = new TextSyndicationContent(string.Format("{0}. {1}", i, userVideo.Title.Text));
+                var playlistItemsListRequest = _youtubeService.PlaylistItems.List("snippet");
+                playlistItemsListRequest.PlaylistId = arguments.PlaylistId;
+                playlistItemsListRequest.MaxResults = 50;
+                playlistItemsListRequest.PageToken = nextPageToken;
+
+                var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+                playlistItems.AddRange(playlistItemsListResponse.Items);
+                nextPageToken = playlistItemsListResponse.NextPageToken;
             }
 
-            return userVideos;
+            return playlistItems.Take(arguments.MaxLength);
         }
 
         private static SyndicationItem GenerateItem(PlaylistItem playlistItem, string baseAddress, Arguments arguments)
@@ -203,23 +201,25 @@ namespace Service
             return item;
         }
 
-        private async Task<IEnumerable<PlaylistItem>> GetPlaylistItemsAsync(Arguments arguments)
+        private async Task<IEnumerable<SyndicationItem>> SortByPopularityAsync(
+            IEnumerable<SyndicationItem> userVideos,
+            IEnumerable<PlaylistItem> playlistItems,
+            DateTime startDate)
         {
-            var playlistItems = new List<PlaylistItem>();
-            var nextPageToken = string.Empty;
-            while (nextPageToken != null && playlistItems.Count < arguments.MaxLength)
+            var videos = await GetVideosAsync(playlistItems.Select(_ => _.Snippet.ResourceId.VideoId).Distinct());
+            var videoDictionary = videos.ToDictionary(_ => _.Id, _ => _);
+            userVideos = userVideos.
+                OrderByDescending(_ => videoDictionary[_.Id].Statistics.ViewCount.GetValueOrDefault()).
+                ToList();
+            var i = 0;
+            foreach (var userVideo in userVideos)
             {
-                var playlistItemsListRequest = _youtubeService.PlaylistItems.List("snippet");
-                playlistItemsListRequest.PlaylistId = arguments.PlaylistId;
-                playlistItemsListRequest.MaxResults = 50;
-                playlistItemsListRequest.PageToken = nextPageToken;
-
-                var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
-                playlistItems.AddRange(playlistItemsListResponse.Items);
-                nextPageToken = playlistItemsListResponse.NextPageToken;
+                userVideo.PublishDate = startDate.AddDays(i);
+                i++;
+                userVideo.Title = new TextSyndicationContent(string.Format("{0}. {1}", i, userVideo.Title.Text));
             }
 
-            return playlistItems.Take(arguments.MaxLength);
+            return userVideos;
         }
 
         private async Task<IEnumerable<Video>> GetVideosAsync(IEnumerable<string> videoIds)
