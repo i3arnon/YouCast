@@ -7,7 +7,7 @@ YouCast allows you to subscribe to video feeds on YouTube as podcasts in any sta
 
 <p align="center"><a href="http://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=B8VLNS5S6UBEE"><img style="display: block; margin-left: auto; margin-right: auto;" src="http://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" alt="" /></a></p>
 
-<p align="center"><img style="display: block; margin-left: auto; margin-right: auto;" src="http://i.imgur.com/TI5wEcj.png" alt="Screenshot" width="463" height="295" /></p>
+<p align="center"><img style="display: block; margin-left: auto; margin-right: auto;" src="https://raw.githubusercontent.com/I3arnon/YouCast/master/Source/Screenshot.PNG" alt="Screenshot" width="463" height="295" /></p>
 
 # Features
 1. Subscribe to any user's public video uploads.
