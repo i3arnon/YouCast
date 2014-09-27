@@ -1,10 +1,8 @@
 ﻿
-namespace SyndicationService
+namespace YouCast
 {
-    // The values are youtube values.
     public enum YouTubeEncoding
     {
-        // 2D
         MP4_360p = 18,
         MP4_720p = 22,
         MP4_1080p = 37,

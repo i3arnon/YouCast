@@ -1,5 +1,4 @@
-﻿
-namespace YouCast
+﻿namespace YouCast
 {
     public static class GeneralInformation
     {

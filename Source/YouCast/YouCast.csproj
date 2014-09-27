@@ -109,6 +109,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="YouTubeEncoding.cs" />
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -161,10 +162,6 @@
     <ProjectReference Include="..\Service\Service.csproj">
       <Project>{9d512757-c17f-45aa-b0f0-5702aeb7a437}</Project>
       <Name>Service</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SyndicationService\SyndicationService.csproj">
-      <Project>{af3f90de-6c83-4c48-a4c5-2310e4383808}</Project>
-      <Name>SyndicationService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

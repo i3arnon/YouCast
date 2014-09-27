@@ -96,9 +96,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arguments.cs" />
     <Compile Include="ItunesFeed.cs" />
     <Compile Include="YoutubeFeed.cs" />
-    <Compile Include="ISyndicationFeed.cs" />
+    <Compile Include="IYoutubeFeed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

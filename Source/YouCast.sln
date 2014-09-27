@@ -5,8 +5,6 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouCast", "YouCast\YouCast.csproj", "{46E83745-F19D-4EB1-BB72-699726DDEA70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyndicationService", "SyndicationService\SyndicationService.csproj", "{AF3F90DE-6C83-4C48-A4C5-2310E4383808}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7F356ACA-5614-4E04-9366-465CD6723860}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -26,10 +24,6 @@ Global
 		{46E83745-F19D-4EB1-BB72-699726DDEA70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46E83745-F19D-4EB1-BB72-699726DDEA70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46E83745-F19D-4EB1-BB72-699726DDEA70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF3F90DE-6C83-4C48-A4C5-2310E4383808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF3F90DE-6C83-4C48-A4C5-2310E4383808}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF3F90DE-6C83-4C48-A4C5-2310E4383808}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF3F90DE-6C83-4C48-A4C5-2310E4383808}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Release|Any CPU.ActiveCfg = Release|Any CPU

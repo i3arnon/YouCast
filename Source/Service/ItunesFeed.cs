@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ServiceModel.Syndication;
 using System.Xml;
 
-namespace SyndicationService
+namespace Service
 {
     public class ItunesFeed : SyndicationFeed
     {

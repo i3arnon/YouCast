@@ -1,5 +1,4 @@
 ﻿using Service;
-using SyndicationService;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
