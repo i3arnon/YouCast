@@ -1,6 +1,5 @@
 ﻿using Service;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -10,52 +9,46 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using YouCast.Properties;
+using MenuItem = System.Windows.Forms.MenuItem;
 
 namespace YouCast
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow
     {
         private readonly string _baseAddress = "http://{0}:{1}/FeedService";
         private readonly System.Windows.Forms.NotifyIcon _myNotifyIcon;
         private const string DefaultPort = "22703";
         private readonly string _localIp;
+        private bool _maxLengthFocus;
+        private bool _gotFocus;
 
         public MainWindow()
         {
             InitializeComponent();
-            
+
             _myNotifyIcon = new System.Windows.Forms.NotifyIcon {Icon = new System.Drawing.Icon("rss.ico")};
             _myNotifyIcon.MouseDoubleClick += (a, b) => WindowState = WindowState.Normal;
-            var items = new List<System.Windows.Forms.MenuItem>();
-
-            var item1 = new System.Windows.Forms.MenuItem("Exit", (a,b) =>
+            _myNotifyIcon.ContextMenu = new System.Windows.Forms.ContextMenu(
+                new[]
                 {
-                    _myNotifyIcon.Visible = false;
-                    Close(); 
+                    new MenuItem("Open", (a, b) => WindowState = WindowState.Normal),
+                    new MenuItem("-"),
+                    new MenuItem(
+                        "Exit",
+                        (a, b) =>
+                        {
+                            _myNotifyIcon.Visible = false;
+                            Close();
+                        })
                 });
-            var item2 = new System.Windows.Forms.MenuItem("-");
-            var item3 = new System.Windows.Forms.MenuItem("Open", (a, b) => WindowState = WindowState.Normal);
-
-            items.Add(item3);
-            items.Add(item2);
-            items.Add(item1);
-
-            _myNotifyIcon.ContextMenu = new System.Windows.Forms.ContextMenu(items.ToArray());
 
             PopulateQualities();
 
             _localIp = Dns.GetHostEntry(Dns.GetHostName()).
                 AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-            var address = Settings.Default.OverrideNetworkSettings
-                ? Settings.Default.HostName
-                : _localIp;
-            var port = Settings.Default.OverrideNetworkSettings
-                ? Settings.Default.PortNumber
-                : DefaultPort;
+            var address = Settings.Default.OverrideNetworkSettings ? Settings.Default.HostName : _localIp;
+            var port = Settings.Default.OverrideNetworkSettings ? Settings.Default.PortNumber : DefaultPort;
             IpAddressLabel.Text = address;
             PortLabel.Text = port;
             _baseAddress = string.Format(_baseAddress, address, port);
@@ -65,10 +58,11 @@ namespace YouCast
 
         private void PopulateQualities()
         {
-            foreach (var value in Enum.GetValues(typeof(YouTubeEncoding)))
+            foreach (var value in Enum.GetValues(typeof (YouTubeEncoding)))
             {
                 Quality.Items.Add(value.ToString().Replace("_", "@"));
             }
+
             Quality.SelectedIndex = 0;
         }
 
@@ -76,21 +70,23 @@ namespace YouCast
         {
             Copy.IsEnabled = true;
 
-            string userId = Input.Text.Trim();
-            var encoding =
-                (YouTubeEncoding)
-                    Enum.Parse(typeof (YouTubeEncoding), (Quality.SelectedItem as string).Replace("@", "_"));
-            int maxLength;
-            bool isPopular = CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value;
+            var encoding = (YouTubeEncoding) Enum.Parse(
+                typeof (YouTubeEncoding),
+                ((string) Quality.SelectedItem).Replace("@", "_"));
 
+            int maxLength;
             int.TryParse(MaxLength.Text, out maxLength);
             if (maxLength < 0)
             {
                 maxLength = 0;
             }
 
-            string url = GenerateUrl(userId, encoding, maxLength, isPopular);
-            
+            var url = GenerateUrl(
+                Input.Text.Trim(),
+                encoding,
+                maxLength,
+                CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value);
+
             Output.Text = url;
             Clipboard.SetDataObject(url);
         }
@@ -100,8 +96,9 @@ namespace YouCast
             var selectedItem = ComboBox.SelectedItem as ListBoxItem;
             if (Equals(selectedItem, UserNameItem))
             {
-                return _baseAddress + string.Format(
-                   "/GetUserFeed?userId={0}&encoding={1}&maxLength={2}&isPopular={3}",
+                return string.Format(
+                    "{0}/GetUserFeed?userId={1}&encoding={2}&maxLength={3}&isPopular={4}",
+                    _baseAddress,
                     userId,
                     encoding,
                     maxLength,
@@ -110,11 +107,12 @@ namespace YouCast
 
             if (Equals(selectedItem, PlaylistItem))
             {
-                return _baseAddress + string.Format(
-                   "/GetPlaylistFeed?playlistId={0}&encoding={1}&maxLength={2}&isPopular={3}",
+                return string.Format(
+                    "{0}/GetPlaylistFeed?playlistId={1}&encoding={2}&maxLength={3}&isPopular={4}",
+                    _baseAddress,
                     userId,
-                    encoding
-                    ,maxLength,
+                    encoding,
+                    maxLength,
                     isPopular);
             }
 
@@ -144,14 +142,14 @@ namespace YouCast
             var processStartInfo = new ProcessStartInfo
             {
                 FileName = "netsh",
-                Arguments = string.Format("advfirewall firewall show rule name=\"{0}\"", GeneralInformation.ApplicationName),
+                Arguments =
+                    string.Format("advfirewall firewall show rule name=\"{0}\"", GeneralInformation.ApplicationName),
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
-                
             };
-            
+
             var port = Settings.Default.OverrideNetworkSettings
                 ? Settings.Default.PortNumber
                 : DefaultPort;
@@ -161,7 +159,11 @@ namespace YouCast
                 processStartInfo = new ProcessStartInfo
                 {
                     FileName = "netsh",
-                    Arguments = string.Format("advfirewall firewall add rule name=\"{0}\" dir=in action=allow protocol=TCP localport={1}", GeneralInformation.ApplicationName, port),
+                    Arguments =
+                        string.Format(
+                            "advfirewall firewall add rule name=\"{0}\" dir=in action=allow protocol=TCP localport={1}",
+                            GeneralInformation.ApplicationName,
+                            port),
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                 };
@@ -171,7 +173,11 @@ namespace YouCast
                 processStartInfo = new ProcessStartInfo
                 {
                     FileName = "netsh",
-                    Arguments = string.Format("advfirewall firewall set rule name=\"{0}\" new localport={1}", GeneralInformation.ApplicationName, port),
+                    Arguments =
+                        string.Format(
+                            "advfirewall firewall set rule name=\"{0}\" new localport={1}",
+                            GeneralInformation.ApplicationName,
+                            port),
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                 };
@@ -182,8 +188,7 @@ namespace YouCast
 
         private void OpenService()
         {
-            var baseAddress = new Uri(_baseAddress);
-            var svcHost = new WebServiceHost(typeof(YoutubeFeed), baseAddress);
+            var svcHost = new WebServiceHost(typeof (YoutubeFeed), new Uri(_baseAddress));
 
             try
             {
@@ -217,8 +222,6 @@ namespace YouCast
             }
         }
 
-        private bool _gotFocus;
-
         private void _input_GotFocus_1(object sender, RoutedEventArgs e)
         {
             if (_gotFocus) return;
@@ -241,15 +244,13 @@ namespace YouCast
             {
                 Input.Text = "for example: I3arnon";
             }
-
-            if (e.AddedItems.Contains(PlaylistItem))
+            else if (e.AddedItems.Contains(PlaylistItem))
             {
                 Input.Text = "for example: PL950C8AEC6CC3E6FE";
             }
-            
+
             _gotFocus = false;
         }
-        private bool _maxLengthFocus;
 
         private void _maxLength_GotFocus_1(object sender, RoutedEventArgs e)
         {
@@ -261,8 +262,8 @@ namespace YouCast
         private void _maxLength_PreviewTextInput_1(object sender, TextCompositionEventArgs e)
         {
             int result;
-            
-            if (!int.TryParse(e.Text,out result))
+
+            if (!int.TryParse(e.Text, out result))
             {
                 e.Handled = true;
             }
@@ -276,8 +277,11 @@ namespace YouCast
             int portNumber;
             if (!int.TryParse(port, out portNumber) || portNumber < 1025 || portNumber > 65535)
             {
-                MessageBox.Show("Port must be a number between 1025 and 65535.", "Invalid Port Number",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Port must be a number between 1025 and 65535.",
+                    "Invalid Port Number",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 PortLabel.Text = DefaultPort;
                 return;
             }
@@ -290,9 +294,12 @@ namespace YouCast
             if (port != Settings.Default.PortNumber)
             {
                 MessageBox.Show(
-                    string.Format("The new port will take affect the next time you open {0}.", GeneralInformation.ApplicationName),
+                    string.Format(
+                        "The new port will take affect the next time you open {0}.",
+                        GeneralInformation.ApplicationName),
                     string.Format("Reopen {0}", GeneralInformation.ApplicationName),
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
 
             UpdateNetworkSettings(host, port);
