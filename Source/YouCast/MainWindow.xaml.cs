@@ -1,4 +1,5 @@
-﻿using Service;
+﻿using System.ServiceModel;
+using Service;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -188,7 +189,8 @@ namespace YouCast
 
         private void OpenService()
         {
-            var svcHost = new WebServiceHost(typeof (YoutubeFeed), new Uri(_baseAddress));
+            var svcHost = new WebServiceHost(typeof (YoutubeFeed));
+            svcHost.AddServiceEndpoint(typeof (IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
 
             try
             {

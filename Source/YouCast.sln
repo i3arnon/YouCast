@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7F356A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{9D512757-C17F-45AA-B0F0-5702AEB7A437}"
 EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "CloudService", "CloudService\CloudService.ccproj", "{F8838154-F8B8-4FE4-A900-9829D048B46E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceWorkerRole", "ServiceWorkerRole\ServiceWorkerRole.csproj", "{FDFDA77F-0FD4-4858-9638-90FCD5F92BFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +32,14 @@ Global
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8838154-F8B8-4FE4-A900-9829D048B46E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8838154-F8B8-4FE4-A900-9829D048B46E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8838154-F8B8-4FE4-A900-9829D048B46E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8838154-F8B8-4FE4-A900-9829D048B46E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDFDA77F-0FD4-4858-9638-90FCD5F92BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDFDA77F-0FD4-4858-9638-90FCD5F92BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDFDA77F-0FD4-4858-9638-90FCD5F92BFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDFDA77F-0FD4-4858-9638-90FCD5F92BFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
