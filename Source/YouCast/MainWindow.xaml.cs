@@ -196,8 +196,8 @@ namespace YouCast
             {
                 svcHost.Open();
 
-                if (svcHost.State != System.ServiceModel.CommunicationState.Opened &&
-                    svcHost.State != System.ServiceModel.CommunicationState.Opening)
+                if (svcHost.State != CommunicationState.Opened &&
+                    svcHost.State != CommunicationState.Opening)
                 {
                     MessageBox.Show("Failed to register the WCF service. Try running as administrator");
                 }
