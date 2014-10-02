@@ -55,17 +55,21 @@ namespace Service
         {
             var baseAddress = GetBaseAddress();
 
+            const string fields = "items(contentDetails,etag,id,snippet)";
             var listRequestForUsername = _youtubeService.Channels.List("snippet,contentDetails");
             listRequestForUsername.ForUsername = userId;
             listRequestForUsername.MaxResults = 1;
+            listRequestForUsername.Fields = fields;
 
             var listRequestForId = _youtubeService.Channels.List("snippet,contentDetails");
             listRequestForId.Id = userId;
             listRequestForId.MaxResults = 1;
-
+            listRequestForId.Fields = fields;
+            
             var channel = (await Task.WhenAll(listRequestForUsername.ExecuteAsync(), listRequestForId.ExecuteAsync())).
                 SelectMany(_ => _.Items).
                 First();
+            
             var arguemnts = new Arguments(channel.ContentDetails.RelatedPlaylists.Uploads, encoding, maxLength, isPopular);
             var cachedFeed = GetFromCache(arguemnts,channel.ETag);
             if (cachedFeed != null)
@@ -174,6 +178,7 @@ namespace Service
                 playlistItemsListRequest.PlaylistId = arguments.PlaylistId;
                 playlistItemsListRequest.MaxResults = 50;
                 playlistItemsListRequest.PageToken = nextPageToken;
+                playlistItemsListRequest.Fields = "items(id,snippet),nextPageToken";
 
                 var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
                 playlistItems.AddRange(playlistItemsListResponse.Items);
@@ -240,6 +245,7 @@ namespace Service
             var statisticsRequest = _youtubeService.Videos.List("statistics");
             statisticsRequest.Id = string.Join(",", videoIds);
             statisticsRequest.MaxResults = 50;
+            statisticsRequest.Fields = "items(id,statistics)";
             return (await statisticsRequest.ExecuteAsync()).Items;
         }
 
