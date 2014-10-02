@@ -1,11 +1,13 @@
 ﻿using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
+using Humanizer;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.Caching;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -61,17 +63,17 @@ namespace Service
             listRequestForId.Id = userId;
             listRequestForId.MaxResults = 1;
 
-            var channel = (await Task.WhenAll(
-                listRequestForUsername.ExecuteAsync(),
-                listRequestForId.ExecuteAsync())).SelectMany(_ => _.Items).First();
+            var channel = (await Task.WhenAll(listRequestForUsername.ExecuteAsync(), listRequestForId.ExecuteAsync())).
+                SelectMany(_ => _.Items).
+                First();
+            var arguemnts = new Arguments(channel.ContentDetails.RelatedPlaylists.Uploads, encoding, maxLength, isPopular);
+            var cachedFeed = GetFromCache(arguemnts,channel.ETag);
+            if (cachedFeed != null)
+            {
+                return cachedFeed;
+            }
 
-            var arguemnts = new Arguments(
-                channel.ContentDetails.RelatedPlaylists.Uploads,
-                encoding,
-                maxLength,
-                isPopular);
-
-            var userFeed = new ItunesFeed(
+            var feed = new ItunesFeed(
                 GetTitle(channel.Snippet.Title, arguemnts),
                 channel.Snippet.Description,
                 new Uri(string.Format(ChannelUrlFormat, channel.Id)))
@@ -83,7 +85,7 @@ namespace Service
                     arguemnts),
             };
 
-            return GetFormatter(userFeed);
+            return SetCache(arguemnts, channel.ETag, GetFormatter(feed));
         }
 
         public async Task<SyndicationFeedFormatter> GetPlaylistFeedAsync(
@@ -105,7 +107,13 @@ namespace Service
             playlistRequest.MaxResults = 1;
 
             var playlist = (await playlistRequest.ExecuteAsync()).Items.First();
-            var userFeed = new ItunesFeed(
+            var cachedFeed = GetFromCache(arguemnts, playlist.ETag);
+            if (cachedFeed != null)
+            {
+                return cachedFeed;
+            }
+
+            var feed = new ItunesFeed(
                 GetTitle(playlist.Snippet.Title, arguemnts),
                 playlist.Snippet.Description,
                 new Uri(string.Format(PlaylistUrlFormat, playlist.Id)))
@@ -117,7 +125,7 @@ namespace Service
                     arguemnts),
             };
 
-            return GetFormatter(userFeed);
+            return SetCache(arguemnts, playlist.ETag, GetFormatter(feed));
         }
 
         public void GetVideo(string videoId, string encoding)
@@ -249,6 +257,48 @@ namespace Service
         {
             var transportAddress = OperationContext.Current.IncomingMessageProperties.Via;
             return string.Format("http://{0}:{1}/FeedService", transportAddress.DnsSafeHost, transportAddress.Port);
+        }
+
+        private static SyndicationFeedFormatter SetCache(Arguments arguments, string eTag, SyndicationFeedFormatter formattedFeed)
+        {
+            MemoryCache.Default.Add(
+                new CacheItem(arguments.ToString(), new Entry(eTag, formattedFeed)),
+                new CacheItemPolicy {SlidingExpiration = 1.Days()});
+            return formattedFeed;
+        }
+
+        private static SyndicationFeedFormatter GetFromCache(Arguments arguments, string eTag)
+        {
+            var key = arguments.ToString();
+            var entry = MemoryCache.Default.Get(key) as Entry;
+            if (entry == null)
+            {
+                return null;
+            }
+
+            if (entry.ETag.Equals(eTag))
+            {
+                return entry.SyndicationFeedFormatter;
+            }
+
+            MemoryCache.Default.Remove(key);
+            return null;
+        }
+
+        #endregion
+
+        #region Types
+
+        private sealed class Entry
+        {
+            public string ETag { get; private set; }
+            public SyndicationFeedFormatter SyndicationFeedFormatter { get; private set; }
+
+            public Entry(string eTag, SyndicationFeedFormatter syndicationFeedFormatter)
+            {
+                ETag = eTag;
+                SyndicationFeedFormatter = syndicationFeedFormatter;
+            }
         }
 
         #endregion
