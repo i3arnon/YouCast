@@ -206,11 +206,7 @@ namespace Service
                     new XAttribute("type", "video/mp4"),
                     new XAttribute(
                         "url",
-                        baseAddress + string.Format(
-                            "/{0}?videoId={1}&encoding={2}",
-                            "Video.mp4",
-                            playlistItem.Snippet.ResourceId.VideoId,
-                            arguments.Encoding))).CreateReader());
+                        baseAddress + $"/{"Video.mp4"}?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
             return item;
         }
 
@@ -229,7 +225,7 @@ namespace Service
             {
                 userVideo.PublishDate = startDate.AddDays(i);
                 i++;
-                userVideo.Title = new TextSyndicationContent(string.Format("{0}. {1}", i, userVideo.Title.Text));
+                userVideo.Title = new TextSyndicationContent($"{i}. {userVideo.Title.Text}");
             }
 
             return userVideos;
@@ -251,7 +247,7 @@ namespace Service
 
         private static string GetTitle(string title, Arguments arguments)
         {
-            return arguments.IsPopular ? string.Format("{0} (By Popularity)", title) : title;
+            return arguments.IsPopular ? $"{title} (By Popularity)" : title;
         }
 
         private static SyndicationFeedFormatter GetFormatter(SyndicationFeed syndicationFeed)
@@ -262,7 +258,7 @@ namespace Service
         private static string GetBaseAddress()
         {
             var transportAddress = OperationContext.Current.IncomingMessageProperties.Via;
-            return string.Format("http://{0}:{1}/FeedService", transportAddress.DnsSafeHost, transportAddress.Port);
+            return $"http://{transportAddress.DnsSafeHost}:{transportAddress.Port}/FeedService";
         }
 
         private static SyndicationFeedFormatter SetCache(Arguments arguments, string eTag, SyndicationFeedFormatter formattedFeed)

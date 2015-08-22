@@ -97,24 +97,12 @@ namespace YouCast
             var selectedItem = ComboBox.SelectedItem as ListBoxItem;
             if (Equals(selectedItem, UserNameItem))
             {
-                return string.Format(
-                    "{0}/GetUserFeed?userId={1}&encoding={2}&maxLength={3}&isPopular={4}",
-                    _baseAddress,
-                    userId,
-                    encoding,
-                    maxLength,
-                    isPopular);
+                return $"{_baseAddress}/GetUserFeed?userId={userId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}";
             }
 
             if (Equals(selectedItem, PlaylistItem))
             {
-                return string.Format(
-                    "{0}/GetPlaylistFeed?playlistId={1}&encoding={2}&maxLength={3}&isPopular={4}",
-                    _baseAddress,
-                    userId,
-                    encoding,
-                    maxLength,
-                    isPopular);
+                return $"{_baseAddress}/GetPlaylistFeed?playlistId={userId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}";
             }
 
             return null;
@@ -144,7 +132,7 @@ namespace YouCast
             {
                 FileName = "netsh",
                 Arguments =
-                    string.Format("advfirewall firewall show rule name=\"{0}\"", GeneralInformation.ApplicationName),
+                    $"advfirewall firewall show rule name=\"{GeneralInformation.ApplicationName}\"",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -161,10 +149,7 @@ namespace YouCast
                 {
                     FileName = "netsh",
                     Arguments =
-                        string.Format(
-                            "advfirewall firewall add rule name=\"{0}\" dir=in action=allow protocol=TCP localport={1}",
-                            GeneralInformation.ApplicationName,
-                            port),
+                        $"advfirewall firewall add rule name=\"{GeneralInformation.ApplicationName}\" dir=in action=allow protocol=TCP localport={port}",
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                 };
@@ -175,10 +160,7 @@ namespace YouCast
                 {
                     FileName = "netsh",
                     Arguments =
-                        string.Format(
-                            "advfirewall firewall set rule name=\"{0}\" new localport={1}",
-                            GeneralInformation.ApplicationName,
-                            port),
+                        $"advfirewall firewall set rule name=\"{GeneralInformation.ApplicationName}\" new localport={port}",
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                 };
@@ -296,10 +278,8 @@ namespace YouCast
             if (port != Settings.Default.PortNumber)
             {
                 MessageBox.Show(
-                    string.Format(
-                        "The new port will take affect the next time you open {0}.",
-                        GeneralInformation.ApplicationName),
-                    string.Format("Reopen {0}", GeneralInformation.ApplicationName),
+                    $"The new port will take affect the next time you open {GeneralInformation.ApplicationName}.",
+                    $"Reopen {GeneralInformation.ApplicationName}",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }

@@ -24,9 +24,7 @@ namespace ServiceWorkerRole
                 typeof (IYoutubeFeed),
                 new WebHttpBinding(),
                 new Uri(
-                    String.Format(
-                        "http://{0}/FeedService",
-                        RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["SyndicationEndpoint"].IPEndpoint)));
+                    $"http://{RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["SyndicationEndpoint"].IPEndpoint}/FeedService"));
             _webServiceHost.Open();
 
             return base.OnStart();

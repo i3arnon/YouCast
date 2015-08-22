@@ -38,8 +38,8 @@ namespace YouCast
                 {
                     // The user did not allow the application to run as administrator
                     MessageBox.Show(
-                        string.Format("Sorry, {0} must run as Administrator to be able to retrieve YouTube Podcasts.", GeneralInformation.ApplicationName),
-                        string.Format("{0} can't start.", GeneralInformation.ApplicationName),
+                        $"Sorry, {GeneralInformation.ApplicationName} must run as Administrator to be able to retrieve YouTube Podcasts.",
+                        $"{GeneralInformation.ApplicationName} can't start.",
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
                 }
