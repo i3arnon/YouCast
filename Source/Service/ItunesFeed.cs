@@ -12,7 +12,6 @@ namespace Service
         public ItunesFeed(string title, string description, Uri feedAlternateLink)
             : base(title, description, feedAlternateLink)
         {
-
         }
 
         public string Subtitle { get; set; }
