@@ -1,9 +1,4 @@
-﻿using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
-using Humanizer;
-using MoreLinq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -13,6 +8,11 @@ using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
+using Humanizer;
+using MoreLinq;
 using YoutubeExtractor;
 
 namespace Service

@@ -1,9 +1,9 @@
-using Microsoft.WindowsAzure.ServiceRuntime;
-using Service;
 using System;
 using System.Net;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using Microsoft.WindowsAzure.ServiceRuntime;
+using Service;
 
 namespace ServiceWorkerRole
 {
