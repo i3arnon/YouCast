@@ -34,7 +34,7 @@
                         <DockPanel>
                             <DockPanel>
                                 <Label>Preferred Quality:</Label>
-                                <ComboBox MinWidth="130" x:Name="Quality" HorizontalContentAlignment="Right"></ComboBox>
+                                <ComboBox MinWidth="130" x:Name="Quality" HorizontalContentAlignment="Right" />
                             </DockPanel>
                             <DockPanel >
                                 <Label DockPanel.Dock="Left">Quantity:</Label>
@@ -58,7 +58,7 @@
                         Podcast URL
                     </GroupBox.Header>
                     <DockPanel>
-                        <TextBox  MinHeight="38" IsReadOnly="True" TextWrapping="Wrap" DockPanel.Dock="Top"  x:Name="Output"></TextBox>
+                        <TextBox  MinHeight="38" IsReadOnly="True" TextWrapping="Wrap" DockPanel.Dock="Top"  x:Name="Output" />
                         <TextBlock TextWrapping="Wrap" DockPanel.Dock="Bottom" Padding="5">* Copy this URL to your favorite podcast client (iTunes, Zune PC, Media Monkey, etc.)</TextBlock>
                     </DockPanel>
                 </GroupBox>
@@ -109,7 +109,7 @@
         <TabItem Header="About">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <Image HorizontalAlignment="Left" Source="rss.ico" Height="90"></Image>
+                    <Image HorizontalAlignment="Left" Source="rss.ico" Height="90" />
                     <Button 
                         Name="YoucastLink" 
                         Style="{StaticResource LinkButton}"  
