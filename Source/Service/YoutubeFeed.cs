@@ -297,8 +297,8 @@ namespace Service
 
         private sealed class Entry
         {
-            public string ETag { get; private set; }
-            public SyndicationFeedFormatter SyndicationFeedFormatter { get; private set; }
+            public string ETag { get; }
+            public SyndicationFeedFormatter SyndicationFeedFormatter { get; }
 
             public Entry(string eTag, SyndicationFeedFormatter syndicationFeedFormatter)
             {
