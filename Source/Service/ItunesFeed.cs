@@ -12,8 +12,6 @@ namespace Service
         private const string Namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
         private const string Prefix = "itunes";
 
-        private readonly List<List<string>> _itunesCategories = new List<List<string>>();
-
         #endregion
 
         #region Constructors
@@ -64,19 +62,6 @@ namespace Service
             WriteItunesElement(writer, "name", OwnerName);
             WriteItunesElement(writer, "email", OwnerEmail);
             writer.WriteEndElement();
-
-            foreach (var category in _itunesCategories)
-            {
-                writer.WriteStartElement(Prefix, "category", Namespace);
-                writer.WriteAttributeString("text", category[0]);
-                if (category.Count == 2)
-                {
-                    writer.WriteStartElement(Prefix, "category", Namespace);
-                    writer.WriteAttributeString("text", category[1]);
-                    writer.WriteEndElement();
-                }
-                writer.WriteEndElement();
-            }
         }
 
         #endregion
