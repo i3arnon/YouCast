@@ -119,10 +119,8 @@
         DWMCOLORIZATIONCOLORCHANGED = 0x0320,
         DWMWINDOWMAXIMIZEDCHANGE = 0x0321,
 
-        #region Windows 7
         DWMSENDICONICTHUMBNAIL = 0x0323,
         DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326,
-        #endregion
 
         USER = 0x0400,
 
@@ -200,8 +198,6 @@
     public static class SingleInstance<TApplication>
                 where TApplication : Application, ISingleInstanceApp
     {
-        #region Private Fields
-
         /// <summary>
         /// String delimiter used in channel names.
         /// </summary>
@@ -237,10 +233,6 @@
         /// </summary>
         private static IList<string> commandLineArgs;
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
         /// Gets list of command line arguments for the application.
         /// </summary>
@@ -248,10 +240,6 @@
         {
             get { return commandLineArgs; }
         }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Checks if the instance of the application attempting to start is the first instance. 
@@ -299,10 +287,6 @@
                 channel = null;
             }
         }
-
-        #endregion
-
-        #region Private Methods
 
         /// <summary>
         /// Gets command line args - for ClickOnce deployed applications, command line args may not be passed directly, they have to be retrieved.
@@ -434,10 +418,6 @@
             ((TApplication)Application.Current).SignalExternalCommandLineArgs(args);
         }
 
-        #endregion
-
-        #region Private Classes
-
         /// <summary>
         /// Remoting service class which is exposed by the server i.e the first instance and called by the second instance
         /// to pass on the command line arguments to the first instance and cause it to activate itself.
@@ -468,7 +448,5 @@
                 return null;
             }
         }
-
-        #endregion
     }
 }

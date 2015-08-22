@@ -20,17 +20,11 @@ namespace Service
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     public sealed class YoutubeFeed : IYoutubeFeed
     {
-        #region Data Members
-
         private const string ChannelUrlFormat = "http://www.youtube.com/channel/{0}";
         private const string VideoUrlFormat = "http://www.youtube.com/watch?v={0}";
         private const string PlaylistUrlFormat = "http://www.youtube.com/playlist?list={0}";
 
         private readonly YouTubeService _youtubeService;
-
-        #endregion
-
-        #region Constructors
 
         public YoutubeFeed()
         {
@@ -42,10 +36,6 @@ namespace Service
                         ApplicationName = "YouCast2",
                     });
         }
-
-        #endregion
-
-        #region IYoutubeFeed
 
         public async Task<SyndicationFeedFormatter> GetUserFeedAsync(
             string userId,
@@ -148,10 +138,6 @@ namespace Service
             WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
             WebOperationContext.Current.OutgoingResponse.Headers["Location"] = video.DownloadUrl;
         }
-
-        #endregion
-
-        #region Methods
 
         private async Task<IEnumerable<SyndicationItem>> GenerateItemsAsync(
             string baseAddress,
@@ -287,10 +273,6 @@ namespace Service
             return null;
         }
 
-        #endregion
-
-        #region Types
-
         private sealed class Entry
         {
             public string ETag { get; }
@@ -302,7 +284,5 @@ namespace Service
                 SyndicationFeedFormatter = syndicationFeedFormatter;
             }
         }
-
-        #endregion
     }
 }

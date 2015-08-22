@@ -7,24 +7,14 @@ namespace Service
 {
     public class ItunesFeed : SyndicationFeed
     {
-        #region Data Members
-
         private const string Namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
         private const string Prefix = "itunes";
-
-        #endregion
-
-        #region Constructors
 
         public ItunesFeed(string title, string description, Uri feedAlternateLink)
             : base(title, description, feedAlternateLink)
         {
 
         }
-
-        #endregion
-
-        #region Properties
 
         public string Subtitle { get; set; }
 
@@ -37,10 +27,6 @@ namespace Service
         public string OwnerEmail { get; set; }
 
         public bool Explicit { get; set; }
-
-        #endregion
-
-        #region SyndicationFeed
 
         protected override void WriteAttributeExtensions(XmlWriter writer, string version)
         {
@@ -64,10 +50,6 @@ namespace Service
             writer.WriteEndElement();
         }
 
-        #endregion
-
-        #region Methods
-
         private static void WriteItunesElement(XmlWriter writer, string name, string value)
         {
             if (value == null) return;
@@ -76,7 +58,5 @@ namespace Service
             writer.WriteValue(value);
             writer.WriteEndElement();
         }
-
-        #endregion
     }
 }
