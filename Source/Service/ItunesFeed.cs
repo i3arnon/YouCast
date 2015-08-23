@@ -9,22 +9,17 @@ namespace Service
         private const string Namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
         private const string Prefix = "itunes";
 
+        public string Subtitle { get; set; }
+        public string Author { get; set; }
+        public string Summary { get; set; }
+        public string OwnerName { get; set; }
+        public string OwnerEmail { get; set; }
+        public bool Explicit { get; set; }
+
         public ItunesFeed(string title, string description, Uri feedAlternateLink)
             : base(title, description, feedAlternateLink)
         {
         }
-
-        public string Subtitle { get; set; }
-
-        public string Author { get; set; }
-
-        public string Summary { get; set; }
-
-        public string OwnerName { get; set; }
-
-        public string OwnerEmail { get; set; }
-
-        public bool Explicit { get; set; }
 
         protected override void WriteAttributeExtensions(XmlWriter writer, string version)
         {
