@@ -59,8 +59,12 @@ namespace Service
             var channel = (await Task.WhenAll(listRequestForUsername.ExecuteAsync(), listRequestForId.ExecuteAsync())).
                 SelectMany(_ => _.Items).
                 First();
-            
-            var arguemnts = new Arguments(channel.ContentDetails.RelatedPlaylists.Uploads, encoding, maxLength, isPopular);
+
+            var arguemnts = new Arguments(
+                channel.ContentDetails.RelatedPlaylists.Uploads,
+                encoding,
+                maxLength,
+                isPopular);
             var cachedFeed = GetFromCache(arguemnts,channel.ETag);
             if (cachedFeed != null)
             {
@@ -129,10 +133,33 @@ namespace Service
                 Where(_ => _.VideoType == VideoType.Mp4).
                 OrderByDescending(_ => _.Resolution).
                 ToList();
-            var video = orderedVideos.FirstOrDefault(_ => _.Resolution == resoultion) ?? orderedVideos.First();
+            var video = orderedVideos.FirstOrDefault(_ => _.Resolution == resoultion) ?? orderedVideos.FirstOrDefault();
+            if (video == null)
+            {
+                WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                return;
+            }
+
             if (video.RequiresDecryption)
             {
                 DownloadUrlResolver.DecryptDownloadUrl(video);
+            }
+
+            WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
+            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = video.DownloadUrl;
+        }
+
+        public void GetAudio(string videoId)
+        {
+            var orderedVideos = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrlFormat, videoId), false).
+                Where(_ => _.AdaptiveType == AdaptiveType.Audio && _.AudioType == AudioType.Aac).
+                OrderByDescending(_ => _.AudioBitrate).
+                ToList();
+            var video = orderedVideos.FirstOrDefault();
+            if (video == null)
+            {
+                WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                return;
             }
 
             WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
@@ -186,13 +213,26 @@ namespace Service
                 Summary = new TextSyndicationContent(playlistItem.Snippet.Description),
             };
 
-            item.ElementExtensions.Add(
-                new XElement(
-                    "enclosure",
-                    new XAttribute("type", "video/mp4"),
-                    new XAttribute(
-                        "url",
-                        baseAddress + $"/{"Video.mp4"}?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
+            if (arguments.Encoding == "Audio")
+            {
+                item.ElementExtensions.Add(
+                    new XElement(
+                        "enclosure",
+                        new XAttribute("type", "audio/mp4"),
+                        new XAttribute(
+                            "url",
+                            baseAddress + $"/{"Audio.m4a"}?videoId={playlistItem.Snippet.ResourceId.VideoId}")).CreateReader());
+            }
+            else
+            {
+                item.ElementExtensions.Add(
+                    new XElement(
+                        "enclosure",
+                        new XAttribute("type", "video/mp4"),
+                        new XAttribute(
+                            "url",
+                            baseAddress + $"/{"Video.mp4"}?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
+            }
             return item;
         }
 

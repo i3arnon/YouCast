@@ -13,7 +13,11 @@ namespace Service
         [WebGet(
             UriTemplate = "GetUserFeed?userId={userId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}",
             BodyStyle = WebMessageBodyStyle.Bare)]
-        Task<SyndicationFeedFormatter> GetUserFeedAsync(string userId, string encoding, int maxLength, bool isPopular);
+        Task<SyndicationFeedFormatter> GetUserFeedAsync(
+            string userId,
+            string encoding,
+            int maxLength,
+            bool isPopular);
 
         [OperationContract]
         [WebGet(
@@ -29,5 +33,9 @@ namespace Service
         [OperationContract]
         [WebGet(UriTemplate = "Video.mp4?videoId={videoId}&encoding={encoding}")]
         void GetVideo(string videoId, string encoding);
+
+        [OperationContract]
+        [WebGet(UriTemplate = "Audio.m4a?videoId={videoId}")]
+        void GetAudio(string videoId);
     }
 }
