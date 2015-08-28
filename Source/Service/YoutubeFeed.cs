@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Google.Apis.Services;
+using Google.Apis.YouTube.v3.Data;
+using MoreLinq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,12 +11,9 @@ using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
-using Humanizer;
-using MoreLinq;
-using YoutubeExtractor;
+using VideoLibrary;
+using Video = Google.Apis.YouTube.v3.Data.Video;
+using YouTubeService = Google.Apis.YouTube.v3.YouTubeService;
 
 namespace Service
 {
@@ -65,7 +65,7 @@ namespace Service
                 encoding,
                 maxLength,
                 isPopular);
-            var cachedFeed = GetFromCache(arguemnts,channel.ETag);
+            var cachedFeed = GetFromCache(arguemnts);
             if (cachedFeed != null)
             {
                 return cachedFeed;
@@ -83,7 +83,7 @@ namespace Service
                     arguemnts),
             };
 
-            return SetCache(arguemnts, channel.ETag, GetFormatter(feed));
+            return SetCache(arguemnts, GetFormatter(feed));
         }
 
         public async Task<SyndicationFeedFormatter> GetPlaylistFeedAsync(
@@ -94,7 +94,7 @@ namespace Service
         {
             var baseAddress = GetBaseAddress();
 
-            var arguemnts = new Arguments(
+            var arguments = new Arguments(
                 playlistId,
                 encoding,
                 maxLength,
@@ -105,14 +105,14 @@ namespace Service
             playlistRequest.MaxResults = 1;
 
             var playlist = (await playlistRequest.ExecuteAsync()).Items.First();
-            var cachedFeed = GetFromCache(arguemnts, playlist.ETag);
+            var cachedFeed = GetFromCache(arguments);
             if (cachedFeed != null)
             {
                 return cachedFeed;
             }
 
             var feed = new ItunesFeed(
-                GetTitle(playlist.Snippet.Title, arguemnts),
+                GetTitle(playlist.Snippet.Title, arguments),
                 playlist.Snippet.Description,
                 new Uri(string.Format(PlaylistUrlFormat, playlist.Id)))
             {
@@ -120,50 +120,52 @@ namespace Service
                 Items = await GenerateItemsAsync(
                     baseAddress,
                     playlist.Snippet.PublishedAt.GetValueOrDefault(),
-                    arguemnts),
+                    arguments),
             };
 
-            return SetCache(arguemnts, playlist.ETag, GetFormatter(feed));
+            return SetCache(arguments, GetFormatter(feed));
         }
 
-        public void GetVideo(string videoId, string encoding)
+        public async Task GetVideoAsync(string videoId, string encoding)
         {
             var resoultion = int.Parse(encoding.Remove(encoding.Length - 1).Substring(4));
-            var orderedVideos = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrlFormat, videoId), false).
-                Where(_ => _.VideoType == VideoType.Mp4).
-                OrderByDescending(_ => _.Resolution).
+            var context = WebOperationContext.Current;
+
+            var videos = await VideoLibrary.YouTubeService.Default.GetAllVideosAsync(
+                string.Format(VideoUrlFormat,videoId));
+            var nonAdaptiveVideos = videos.
+                Where(_ => _.Format == VideoFormat.Mp4 && !_.IsAdaptive).
                 ToList();
-            var video = orderedVideos.FirstOrDefault(_ => _.Resolution == resoultion) ?? orderedVideos.FirstOrDefault();
-            if (video == null)
+            var nonAdaptiveVideo =
+                nonAdaptiveVideos.FirstOrDefault(_ => _.Resolution == resoultion) ??
+                nonAdaptiveVideos.MaxBy(_ => _.Resolution);
+            if (nonAdaptiveVideo == null)
             {
-                WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
                 return;
             }
 
-            if (video.RequiresDecryption)
-            {
-                DownloadUrlResolver.DecryptDownloadUrl(video);
-            }
-
-            WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = video.DownloadUrl;
+            context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
+            context.OutgoingResponse.Headers["Location"] = nonAdaptiveVideo.Uri;
         }
 
-        public void GetAudio(string videoId)
+        public async Task GetAudioAsync(string videoId)
         {
-            var orderedVideos = DownloadUrlResolver.GetDownloadUrls(string.Format(VideoUrlFormat, videoId), false).
-                Where(_ => _.AdaptiveType == AdaptiveType.Audio && _.AudioType == AudioType.Aac).
-                OrderByDescending(_ => _.AudioBitrate).
+            var context = WebOperationContext.Current;
+
+            var videos = await VideoLibrary.YouTubeService.Default.GetAllVideosAsync(
+                string.Format(VideoUrlFormat, videoId));
+            var audios = videos.
+                Where(_ => _.AudioFormat == AudioFormat.Aac && _.AdaptiveKind == AdaptiveKind.Audio).
                 ToList();
-            var video = orderedVideos.FirstOrDefault();
-            if (video == null)
+            if (audios.Count == 0)
             {
-                WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
                 return;
             }
 
-            WebOperationContext.Current.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-            WebOperationContext.Current.OutgoingResponse.Headers["Location"] = video.DownloadUrl;
+            context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
+            context.OutgoingResponse.Headers["Location"] = audios.MaxBy(_ => _.AudioBitrate).Uri;
         }
 
         private async Task<IEnumerable<SyndicationItem>> GenerateItemsAsync(
@@ -287,42 +289,17 @@ namespace Service
             return $"http://{transportAddress.DnsSafeHost}:{transportAddress.Port}/FeedService";
         }
 
-        private static SyndicationFeedFormatter SetCache(Arguments arguments, string eTag, SyndicationFeedFormatter formattedFeed)
+        private static SyndicationFeedFormatter SetCache(Arguments arguments, SyndicationFeedFormatter formattedFeed)
         {
             MemoryCache.Default.Add(
-                new CacheItem(arguments.ToString(), new Entry(eTag, formattedFeed)),
-                new CacheItemPolicy {SlidingExpiration = 1.Days()});
+                new CacheItem(arguments.ToString(), formattedFeed),
+                new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1)});
             return formattedFeed;
         }
 
-        private static SyndicationFeedFormatter GetFromCache(Arguments arguments, string eTag)
+        private static SyndicationFeedFormatter GetFromCache(Arguments arguments)
         {
-            var key = arguments.ToString();
-            var entry = MemoryCache.Default.Get(key) as Entry;
-            if (entry == null)
-            {
-                return null;
-            }
-
-            if (entry.ETag.Equals(eTag))
-            {
-                return entry.SyndicationFeedFormatter;
-            }
-
-            MemoryCache.Default.Remove(key);
-            return null;
-        }
-
-        private sealed class Entry
-        {
-            public string ETag { get; }
-            public SyndicationFeedFormatter SyndicationFeedFormatter { get; }
-
-            public Entry(string eTag, SyndicationFeedFormatter syndicationFeedFormatter)
-            {
-                ETag = eTag;
-                SyndicationFeedFormatter = syndicationFeedFormatter;
-            }
+            return MemoryCache.Default.Get(arguments.ToString()) as SyndicationFeedFormatter;
         }
     }
 }

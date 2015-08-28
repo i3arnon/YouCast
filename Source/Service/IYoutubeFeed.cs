@@ -32,10 +32,10 @@ namespace Service
 
         [OperationContract]
         [WebGet(UriTemplate = "Video.mp4?videoId={videoId}&encoding={encoding}")]
-        void GetVideo(string videoId, string encoding);
+        Task GetVideoAsync(string videoId, string encoding);
 
         [OperationContract]
         [WebGet(UriTemplate = "Audio.m4a?videoId={videoId}")]
-        void GetAudio(string videoId);
+        Task GetAudioAsync(string videoId);
     }
 }
