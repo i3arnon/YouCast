@@ -310,7 +310,7 @@ namespace YouCast
 
         private void YoucastLink_OnClick(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/I3arnon/YouCast");
+            Process.Start("http://youcast.i3arnon.com/");
         }
 
         private void TwitterLink_OnClick(object sender, RoutedEventArgs e)
