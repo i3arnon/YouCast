@@ -60,7 +60,7 @@
                     </GroupBox.Header>
                     <DockPanel>
                         <TextBox  MinHeight="38" IsReadOnly="True" TextWrapping="Wrap" DockPanel.Dock="Top"  x:Name="Output" />
-                        <TextBlock TextWrapping="Wrap" DockPanel.Dock="Bottom" Padding="5">* Copy this URL to your favorite podcast client (iTunes, Zune PC, Media Monkey, etc.)</TextBlock>
+                        <TextBlock TextWrapping="Wrap" DockPanel.Dock="Bottom" Padding="5">Copy this URL to your favorite podcast app (iTunes, BeyondPod, Pocket Casts, etc.)</TextBlock>
                     </DockPanel>
                 </GroupBox>
             </StackPanel>
