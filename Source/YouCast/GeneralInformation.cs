@@ -2,6 +2,6 @@
 {
     public static class GeneralInformation
     {
-        public const string ApplicationName = "Youcast";
+        public const string ApplicationName = "YouCast";
     }
 }
