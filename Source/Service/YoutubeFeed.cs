@@ -45,7 +45,7 @@ namespace Service
         {
             var baseAddress = GetBaseAddress();
 
-            const string fields = "items(contentDetails,etag,id,snippet)";
+            const string fields = "items(contentDetails,id,snippet)";
             var listRequestForUsername = _youtubeService.Channels.List("snippet,contentDetails");
             listRequestForUsername.ForUsername = userId;
             listRequestForUsername.MaxResults = 1;
@@ -60,19 +60,19 @@ namespace Service
                 SelectMany(_ => _.Items).
                 First();
 
-            var arguemnts = new Arguments(
+            var arguments = new Arguments(
                 channel.ContentDetails.RelatedPlaylists.Uploads,
                 encoding,
                 maxLength,
                 isPopular);
-            var cachedFeed = GetFromCache(arguemnts);
+            var cachedFeed = GetFromCache(arguments);
             if (cachedFeed != null)
             {
                 return cachedFeed;
             }
 
             var feed = new ItunesFeed(
-                GetTitle(channel.Snippet.Title, arguemnts),
+                GetTitle(channel.Snippet.Title, arguments),
                 channel.Snippet.Description,
                 new Uri(string.Format(ChannelUrlFormat, channel.Id)))
             {
@@ -80,10 +80,10 @@ namespace Service
                 Items = await GenerateItemsAsync(
                     baseAddress,
                     channel.Snippet.PublishedAt.GetValueOrDefault(),
-                    arguemnts),
+                    arguments),
             };
 
-            return SetCache(arguemnts, GetFormatter(feed));
+            return SetCache(arguments, GetFormatter(feed));
         }
 
         public async Task<SyndicationFeedFormatter> GetPlaylistFeedAsync(
@@ -128,44 +128,46 @@ namespace Service
 
         public async Task GetVideoAsync(string videoId, string encoding)
         {
-            var resoultion = int.Parse(encoding.Remove(encoding.Length - 1).Substring(4));
+            var resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(4));
             var context = WebOperationContext.Current;
 
-            var videos = await VideoLibrary.YouTubeService.Default.GetAllVideosAsync(
-                string.Format(VideoUrlFormat,videoId));
+            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(VideoUrlFormat, videoId));
             var nonAdaptiveVideos = videos.
                 Where(_ => _.Format == VideoFormat.Mp4 && !_.IsAdaptive).
                 ToList();
             var nonAdaptiveVideo =
-                nonAdaptiveVideos.FirstOrDefault(_ => _.Resolution == resoultion) ??
+                nonAdaptiveVideos.FirstOrDefault(_ => _.Resolution == resolution) ??
                 nonAdaptiveVideos.MaxBy(_ => _.Resolution);
-            if (nonAdaptiveVideo == null)
+            if (nonAdaptiveVideo != null)
+            {
+                var redirectUri = await nonAdaptiveVideo.GetUriAsync();
+                context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
+                context.OutgoingResponse.Headers["Location"] = redirectUri;
+            }
+            else
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-                return;
             }
-
-            context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-            context.OutgoingResponse.Headers["Location"] = nonAdaptiveVideo.Uri;
         }
 
         public async Task GetAudioAsync(string videoId)
         {
             var context = WebOperationContext.Current;
 
-            var videos = await VideoLibrary.YouTubeService.Default.GetAllVideosAsync(
-                string.Format(VideoUrlFormat, videoId));
+            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(VideoUrlFormat, videoId));
             var audios = videos.
                 Where(_ => _.AudioFormat == AudioFormat.Aac && _.AdaptiveKind == AdaptiveKind.Audio).
                 ToList();
-            if (audios.Count == 0)
+            if (audios.Count > 0)
+            {
+                var redirectUri = await audios.MaxBy(_ => _.AudioBitrate).GetUriAsync();
+                context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
+                context.OutgoingResponse.Headers["Location"] = redirectUri;
+            }
+            else
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-                return;
             }
-
-            context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-            context.OutgoingResponse.Headers["Location"] = audios.MaxBy(_ => _.AudioBitrate).Uri;
         }
 
         private async Task<IEnumerable<SyndicationItem>> GenerateItemsAsync(
