@@ -94,6 +94,7 @@ namespace YouCast
 
         private string GenerateUrl(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular)
         {
+            userId = WebUtility.UrlEncode(userId);
             var selectedItem = ComboBox.SelectedItem as ListBoxItem;
             if (Equals(selectedItem, UserNameItem))
             {
