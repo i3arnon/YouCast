@@ -260,10 +260,10 @@ namespace YouCast
             var port = PortLabel.Text;
 
             int portNumber;
-            if (!int.TryParse(port, out portNumber) || portNumber < 1025 || portNumber > 65535)
+            if (!int.TryParse(port, out portNumber) || portNumber < 1 || portNumber > 65535)
             {
                 MessageBox.Show(
-                    "Port must be a number between 1025 and 65535.",
+                    "Port must be a number between 1 and 65535.",
                     "Invalid Port Number",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
