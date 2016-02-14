@@ -5,13 +5,15 @@
         Loaded="Window_Loaded_1"
         Icon="rss.ico"
         StateChanged="Window_StateChanged_1"
-        FontFamily="tahoma"
         FontSize="13"
         Title="{x:Static youCast:GeneralInformation.ApplicationName}" 
         Height="295" 
         Width="463" 
         ResizeMode="CanMinimize" 
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto">
     <TabControl>
         <TabItem Header="Podcast">
                 <StackPanel>
