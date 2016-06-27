@@ -119,7 +119,7 @@
                     <Button 
                         Name="TwitterLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="TwitterLink_OnClick">@BarArnon</Button>
+                        Click="TwitterLink_OnClick">@i3arnon</Button>
                     <Label VerticalAlignment="Center">under the </Label>
                     <Button 
                         Name="GplLink" 

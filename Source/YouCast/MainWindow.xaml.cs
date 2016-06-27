@@ -27,7 +27,7 @@ namespace YouCast
         {
             InitializeComponent();
 
-            _myNotifyIcon = new System.Windows.Forms.NotifyIcon {Icon = new System.Drawing.Icon("rss.ico")};
+            _myNotifyIcon = new System.Windows.Forms.NotifyIcon { Icon = new System.Drawing.Icon("rss.ico") };
             _myNotifyIcon.MouseDoubleClick += (a, b) => WindowState = WindowState.Normal;
             _myNotifyIcon.ContextMenu = new System.Windows.Forms.ContextMenu(
                 new[]
@@ -59,7 +59,7 @@ namespace YouCast
 
         private void PopulateQualities()
         {
-            foreach (var value in Enum.GetValues(typeof (YouTubeEncoding)))
+            foreach (var value in Enum.GetValues(typeof(YouTubeEncoding)))
             {
                 Quality.Items.Add(value.ToString().Replace("_", "@"));
             }
@@ -71,9 +71,9 @@ namespace YouCast
         {
             Copy.IsEnabled = true;
 
-            var encoding = (YouTubeEncoding) Enum.Parse(
-                typeof (YouTubeEncoding),
-                ((string) Quality.SelectedItem).Replace("@", "_"));
+            var encoding = (YouTubeEncoding)Enum.Parse(
+                typeof(YouTubeEncoding),
+                ((string)Quality.SelectedItem).Replace("@", "_"));
 
             int maxLength;
             int.TryParse(MaxLength.Text, out maxLength);
@@ -172,8 +172,8 @@ namespace YouCast
 
         private void OpenService()
         {
-            var svcHost = new WebServiceHost(typeof (YoutubeFeed));
-            svcHost.AddServiceEndpoint(typeof (IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
+            var svcHost = new WebServiceHost(typeof(YoutubeFeed));
+            svcHost.AddServiceEndpoint(typeof(IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
 
             try
             {
@@ -316,7 +316,7 @@ namespace YouCast
 
         private void TwitterLink_OnClick(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://twitter.com/BarArnon");
+            Process.Start("https://twitter.com/i3arnon");
         }
 
         private void GplLink_OnClick(object sender, RoutedEventArgs e)
