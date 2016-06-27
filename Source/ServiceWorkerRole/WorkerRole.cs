@@ -1,9 +1,9 @@
+using Microsoft.WindowsAzure.ServiceRuntime;
+using Service;
 using System;
 using System.Net;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using Microsoft.WindowsAzure.ServiceRuntime;
-using Service;
 
 namespace ServiceWorkerRole
 {
@@ -19,12 +19,11 @@ namespace ServiceWorkerRole
             // For information on handling configuration changes
             // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.
 
-            _webServiceHost = new WebServiceHost(typeof (YoutubeFeed));
+            _webServiceHost = new WebServiceHost(typeof(YoutubeFeed));
             _webServiceHost.AddServiceEndpoint(
-                typeof (IYoutubeFeed),
+                typeof(IYoutubeFeed),
                 new WebHttpBinding(),
-                new Uri(
-                    $"http://{RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["SyndicationEndpoint"].IPEndpoint}/FeedService"));
+                new Uri($"http://{RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["SyndicationEndpoint"].IPEndpoint}/FeedService"));
             _webServiceHost.Open();
 
             return base.OnStart();
