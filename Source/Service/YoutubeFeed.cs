@@ -55,7 +55,7 @@ namespace Service
             listRequestForId.Id = userId;
             listRequestForId.MaxResults = 1;
             listRequestForId.Fields = fields;
-            
+
             var channel = (await Task.WhenAll(listRequestForUsername.ExecuteAsync(), listRequestForId.ExecuteAsync())).
                 SelectMany(_ => _.Items).
                 First();
@@ -261,10 +261,8 @@ namespace Service
             return userVideos;
         }
 
-        private async Task<IEnumerable<Video>> GetVideosAsync(IEnumerable<string> videoIds)
-        {
-            return (await Task.WhenAll(videoIds.Batch(50).Select(GetVideoBatchAsync))).SelectMany(_ => _);
-        }
+        private async Task<IEnumerable<Video>> GetVideosAsync(IEnumerable<string> videoIds) =>
+            (await Task.WhenAll(videoIds.Batch(50).Select(GetVideoBatchAsync))).SelectMany(_ => _);
 
         private async Task<IEnumerable<Video>> GetVideoBatchAsync(IEnumerable<string> videoIds)
         {
@@ -275,15 +273,11 @@ namespace Service
             return (await statisticsRequest.ExecuteAsync()).Items;
         }
 
-        private static string GetTitle(string title, Arguments arguments)
-        {
-            return arguments.IsPopular ? $"{title} (By Popularity)" : title;
-        }
+        private static string GetTitle(string title, Arguments arguments) =>
+            arguments.IsPopular ? $"{title} (By Popularity)" : title;
 
-        private static SyndicationFeedFormatter GetFormatter(SyndicationFeed syndicationFeed)
-        {
-            return new Rss20FeedFormatter(syndicationFeed);
-        }
+        private static SyndicationFeedFormatter GetFormatter(SyndicationFeed syndicationFeed) =>
+            new Rss20FeedFormatter(syndicationFeed);
 
         private static string GetBaseAddress()
         {
@@ -295,13 +289,11 @@ namespace Service
         {
             MemoryCache.Default.Add(
                 new CacheItem(arguments.ToString(), formattedFeed),
-                new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1)});
+                new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1) });
             return formattedFeed;
         }
 
-        private static SyndicationFeedFormatter GetFromCache(Arguments arguments)
-        {
-            return MemoryCache.Default.Get(arguments.ToString()) as SyndicationFeedFormatter;
-        }
+        private static SyndicationFeedFormatter GetFromCache(Arguments arguments) =>
+            MemoryCache.Default.Get(arguments.ToString()) as SyndicationFeedFormatter;
     }
 }

@@ -21,10 +21,8 @@ namespace Service
         {
         }
 
-        protected override void WriteAttributeExtensions(XmlWriter writer, string version)
-        {
+        protected override void WriteAttributeExtensions(XmlWriter writer, string version) =>
             writer.WriteAttributeString("xmlns", Prefix, null, Namespace);
-        }
 
         protected override void WriteElementExtensions(XmlWriter writer, string version)
         {

@@ -109,10 +109,8 @@ namespace YouCast
             return null;
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
+        private void Button_Click_2(object sender, RoutedEventArgs e) =>
             Clipboard.SetDataObject(Output.Text);
-        }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
@@ -309,19 +307,13 @@ namespace YouCast
             Settings.Default.Save();
         }
 
-        private void YoucastLink_OnClick(object sender, RoutedEventArgs e)
-        {
+        private void YoucastLink_OnClick(object sender, RoutedEventArgs e) =>
             Process.Start("http://youcast.i3arnon.com/");
-        }
 
-        private void TwitterLink_OnClick(object sender, RoutedEventArgs e)
-        {
+        private void TwitterLink_OnClick(object sender, RoutedEventArgs e) =>
             Process.Start("https://twitter.com/i3arnon");
-        }
 
-        private void GplLink_OnClick(object sender, RoutedEventArgs e)
-        {
+        private void GplLink_OnClick(object sender, RoutedEventArgs e) =>
             Process.Start("https://github.com/I3arnon/YouCast/blob/master/LICENSE");
-        }
     }
 }

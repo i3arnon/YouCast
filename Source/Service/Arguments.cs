@@ -2,10 +2,10 @@
 {
     public sealed class Arguments
     {
-        public string PlaylistId { get; set; }
-        public string Encoding { get; set; }
-        public int MaxLength { get; set; }
-        public bool IsPopular { get; set; }
+        public string PlaylistId { get; }
+        public string Encoding { get; }
+        public int MaxLength { get; }
+        public bool IsPopular { get; }
 
         public Arguments(string playlistId, string encoding, int maxLength, bool isPopular)
         {
@@ -20,9 +20,7 @@
             }
         }
 
-        public override string ToString()
-        {
-            return string.Join(",", PlaylistId, Encoding.ToLower(), MaxLength, IsPopular);
-        }
+        public override string ToString() =>
+            string.Join(",", PlaylistId, Encoding.ToLower(), MaxLength, IsPopular);
     }
 }
