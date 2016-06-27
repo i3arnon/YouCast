@@ -4,7 +4,7 @@
     "WindowsAzure.Storage": "6.2.0"
   },
   "frameworks": {
-    "net45": { }
+    "net461": { }
   },
   "runtimes": {
     "win": { }
