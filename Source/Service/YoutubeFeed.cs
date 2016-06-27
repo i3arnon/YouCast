@@ -237,6 +237,7 @@ namespace Service
                             "url",
                             baseAddress + $"/{"Video.mp4"}?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
             }
+
             return item;
         }
 
