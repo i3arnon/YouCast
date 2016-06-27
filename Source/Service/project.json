@@ -1,13 +1,13 @@
 ﻿{
   "dependencies": {
-    "Google.Apis.YouTube.v3": "1.10.0.1620",
+    "Google.Apis.YouTube.v3": "1.13.1.529",
     "morelinq": "2.0.0-alpha01",
-    "VideoLibrary": "1.3.3"
+    "VideoLibrary": "1.3.4"
   },
   "frameworks": {
-    "net461": { }
+    "net461": {}
   },
   "runtimes": {
-    "win": { }
+    "win": {}
   }
 }

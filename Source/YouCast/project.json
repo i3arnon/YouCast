@@ -1,8 +1,8 @@
 ﻿{
   "frameworks": {
-    "net461": { }
+    "net461": {}
   },
   "runtimes": {
-    "win": { }
+    "win": {}
   }
 }
