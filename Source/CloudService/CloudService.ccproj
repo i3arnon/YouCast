@@ -55,6 +55,12 @@
     <Content Include="ServiceWorkerRoleContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="ServiceWorkerRoleContent\install.cmd">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ServiceWorkerRoleContent\NDP461-KB3102438-Web.exe">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PublishProfile Include="Profiles\YouCastProduction.azurePubxml" />
