@@ -6,8 +6,8 @@ namespace Service
 {
     public class ItunesFeed : SyndicationFeed
     {
-        private const string Namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
-        private const string Prefix = "itunes";
+        private const string _namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
+        private const string _prefix = "itunes";
 
         public string Subtitle { get; set; }
         public string Author { get; set; }
@@ -22,7 +22,7 @@ namespace Service
         }
 
         protected override void WriteAttributeExtensions(XmlWriter writer, string version) =>
-            writer.WriteAttributeString("xmlns", Prefix, null, Namespace);
+            writer.WriteAttributeString("xmlns", _prefix, null, _namespace);
 
         protected override void WriteElementExtensions(XmlWriter writer, string version)
         {
@@ -35,7 +35,7 @@ namespace Service
             }
             WriteItunesElement(writer, "explicit", Explicit ? "yes" : "no");
 
-            writer.WriteStartElement(Prefix, "owner", Namespace);
+            writer.WriteStartElement(_prefix, "owner", _namespace);
             WriteItunesElement(writer, "name", OwnerName);
             WriteItunesElement(writer, "email", OwnerEmail);
             writer.WriteEndElement();
@@ -45,7 +45,7 @@ namespace Service
         {
             if (value == null) return;
 
-            writer.WriteStartElement(Prefix, name, Namespace);
+            writer.WriteStartElement(_prefix, name, _namespace);
             writer.WriteValue(value);
             writer.WriteEndElement();
         }

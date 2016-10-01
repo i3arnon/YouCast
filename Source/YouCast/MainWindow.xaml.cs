@@ -17,9 +17,9 @@ namespace YouCast
 {
     public partial class MainWindow
     {
-        private const string CloudHostName = "youcast.cloudapp.net";
-        private const int CloudPort = 80;
-        private const int DefaultPort = 22703;
+        private const string _cloudHostName = "youcast.cloudapp.net";
+        private const int _cloudPort = 80;
+        private const int _defaultPort = 22703;
 
         private readonly System.Windows.Forms.NotifyIcon _myNotifyIcon;
         private readonly string _localIp;
@@ -75,8 +75,8 @@ namespace YouCast
             int port;
             if (Settings.Default.UseCloudService)
             {
-                hostName = CloudHostName;
-                port = CloudPort;
+                hostName = _cloudHostName;
+                port = _cloudPort;
                 IpAddressLabel.IsEnabled = false;
                 PortLabel.IsEnabled = false;
                 UseCloud.IsChecked = true;
@@ -89,7 +89,7 @@ namespace YouCast
             else
             {
                 hostName = _localIp;
-                port = DefaultPort;
+                port = _defaultPort;
             }
             IpAddressLabel.Text = hostName;
             PortLabel.Text = port.ToString();
@@ -182,7 +182,7 @@ namespace YouCast
 
             var port = Settings.Default.OverrideNetworkSettings
                 ? int.Parse(Settings.Default.PortNumber)
-                : DefaultPort;
+                : _defaultPort;
 
             Process.Start(
                     isExists
@@ -325,11 +325,11 @@ namespace YouCast
                     "Invalid Port Number",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
-                PortLabel.Text = DefaultPort.ToString();
+                PortLabel.Text = _defaultPort.ToString();
                 return;
             }
 
-            if (!Settings.Default.OverrideNetworkSettings && portNumber == DefaultPort && host == _localIp)
+            if (!Settings.Default.OverrideNetworkSettings && portNumber == _defaultPort && host == _localIp)
             {
                 return;
             }

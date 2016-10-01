@@ -20,9 +20,9 @@ namespace Service
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     public sealed class YoutubeFeed : IYoutubeFeed
     {
-        private const string ChannelUrlFormat = "http://www.youtube.com/channel/{0}";
-        private const string VideoUrlFormat = "http://www.youtube.com/watch?v={0}";
-        private const string PlaylistUrlFormat = "http://www.youtube.com/playlist?list={0}";
+        private const string _channelUrlFormat = "http://www.youtube.com/channel/{0}";
+        private const string _videoUrlFormat = "http://www.youtube.com/watch?v={0}";
+        private const string _playlistUrlFormat = "http://www.youtube.com/playlist?list={0}";
 
         private readonly YouTubeService _youtubeService;
 
@@ -74,7 +74,7 @@ namespace Service
             var feed = new ItunesFeed(
                 GetTitle(channel.Snippet.Title, arguments),
                 channel.Snippet.Description,
-                new Uri(string.Format(ChannelUrlFormat, channel.Id)))
+                new Uri(string.Format(_channelUrlFormat, channel.Id)))
             {
                 ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
                 Items = await GenerateItemsAsync(
@@ -114,7 +114,7 @@ namespace Service
             var feed = new ItunesFeed(
                 GetTitle(playlist.Snippet.Title, arguments),
                 playlist.Snippet.Description,
-                new Uri(string.Format(PlaylistUrlFormat, playlist.Id)))
+                new Uri(string.Format(_playlistUrlFormat, playlist.Id)))
             {
                 ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
                 Items = await GenerateItemsAsync(
@@ -131,7 +131,7 @@ namespace Service
             var resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(4));
             var context = WebOperationContext.Current;
 
-            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(VideoUrlFormat, videoId));
+            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(_videoUrlFormat, videoId));
             var nonAdaptiveVideos = videos.
                 Where(_ => _.Format == VideoFormat.Mp4 && !_.IsAdaptive).
                 ToList();
@@ -154,7 +154,7 @@ namespace Service
         {
             var context = WebOperationContext.Current;
 
-            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(VideoUrlFormat, videoId));
+            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(_videoUrlFormat, videoId));
             var audios = videos.
                 Where(_ => _.AudioFormat == AudioFormat.Aac && _.AdaptiveKind == AdaptiveKind.Audio).
                 ToList();
@@ -210,7 +210,7 @@ namespace Service
             var item = new SyndicationItem(
                 playlistItem.Snippet.Title,
                 string.Empty,
-                new Uri(string.Format(VideoUrlFormat, playlistItem.Snippet.ResourceId.VideoId)))
+                new Uri(string.Format(_videoUrlFormat, playlistItem.Snippet.ResourceId.VideoId)))
             {
                 Id = playlistItem.Snippet.ResourceId.VideoId,
                 PublishDate = playlistItem.Snippet.PublishedAt.GetValueOrDefault(),
