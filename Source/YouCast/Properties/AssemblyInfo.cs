@@ -9,7 +9,7 @@ using YouCast;
 [assembly: AssemblyTitle(GeneralInformation.ApplicationName)]
 [assembly: AssemblyDescription("Turn YouTube Channels into Subscribable Podcasts")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("I3arnon")]
+[assembly: AssemblyCompany("i3arnon")]
 [assembly: AssemblyProduct(GeneralInformation.ApplicationName)]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]

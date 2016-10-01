@@ -41,7 +41,7 @@
                                 VerticalContentAlignment="Center"
                                 GotFocus="_input_GotFocus_1"
                                 TextChanged="_input_TextChanged_1"
-                                Text="For example: I3arnon"/>
+                                Text="For example: i3arnon"/>
                         </DockPanel>
                         <DockPanel>
                             <DockPanel>

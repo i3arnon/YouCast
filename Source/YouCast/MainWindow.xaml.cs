@@ -277,7 +277,7 @@ namespace YouCast
 
             if (e.AddedItems.Contains(UserNameItem))
             {
-                Input.Text = "for example: I3arnon";
+                Input.Text = "for example: i3arnon";
             }
             else if (e.AddedItems.Contains(PlaylistItem))
             {
@@ -367,6 +367,6 @@ namespace YouCast
             Process.Start("https://twitter.com/i3arnon");
 
         private void GplLink_OnClick(object sender, RoutedEventArgs e) =>
-            Process.Start("https://github.com/I3arnon/YouCast/blob/master/LICENSE");
+            Process.Start("https://github.com/i3arnon/YouCast/blob/master/LICENSE");
     }
 }
