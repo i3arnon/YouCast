@@ -16,12 +16,17 @@ namespace YouCast
 {
     public partial class MainWindow
     {
-        private readonly string _baseAddress = "http://{0}:{1}/FeedService";
+        private const string CloudHostName = "youcast.cloudapp.net";
+        private const int CloudPort = 80;
+        private const int DefaultPort = 22703;
+
         private readonly System.Windows.Forms.NotifyIcon _myNotifyIcon;
-        private const string DefaultPort = "22703";
         private readonly string _localIp;
-        private bool _maxLengthFocus;
+
+        private string _baseAddress;
         private bool _gotFocus;
+        private bool _maxLengthFocus;
+        private WebServiceHost _serviceHost;
 
         public MainWindow()
         {
@@ -43,18 +48,11 @@ namespace YouCast
                         })
                 });
 
-            PopulateQualities();
-
             _localIp = Dns.GetHostEntry(Dns.GetHostName()).
                 AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-            var address = Settings.Default.OverrideNetworkSettings ? Settings.Default.HostName : _localIp;
-            var port = Settings.Default.OverrideNetworkSettings ? Settings.Default.PortNumber : DefaultPort;
-            IpAddressLabel.Text = address;
-            PortLabel.Text = port;
-            _baseAddress = string.Format(_baseAddress, address, port);
-
-            Generate.Content = "Generate & Copy URL";
+            PopulateQualities();
+            LoadNetworkSettings();
         }
 
         private void PopulateQualities()
@@ -67,7 +65,37 @@ namespace YouCast
             Quality.SelectedIndex = 0;
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void LoadNetworkSettings()
+        {
+            IpAddressLabel.IsEnabled = true;
+            PortLabel.IsEnabled = true;
+
+            string hostName;
+            int port;
+            if (Settings.Default.UseCloudService)
+            {
+                hostName = CloudHostName;
+                port = CloudPort;
+                IpAddressLabel.IsEnabled = false;
+                PortLabel.IsEnabled = false;
+                UseCloud.IsChecked = true;
+            }
+            else if (Settings.Default.OverrideNetworkSettings)
+            {
+                hostName = Settings.Default.HostName;
+                port = int.Parse(Settings.Default.PortNumber);
+            }
+            else
+            {
+                hostName = _localIp;
+                port = DefaultPort;
+            }
+            IpAddressLabel.Text = hostName;
+            PortLabel.Text = port.ToString();
+            _baseAddress = new UriBuilder("HTTP", hostName, port == 80 ? -1 : port, "FeedService").ToString();
+        }
+
+        private void Generate_Click(object sender, RoutedEventArgs e)
         {
             Copy.IsEnabled = true;
 
@@ -109,7 +137,7 @@ namespace YouCast
             return null;
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e) =>
+        private void Copy_Click(object sender, RoutedEventArgs e) =>
             Clipboard.SetDataObject(Output.Text);
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
@@ -121,11 +149,19 @@ namespace YouCast
                 StartMinimized.IsChecked = true;
             }
 
-            AddFirewallRule();
-            OpenService();
+            UpdateLocalService();
         }
 
-        private static void AddFirewallRule()
+        private void UpdateLocalService()
+        {
+            if (Settings.Default.UseCloudService) return;
+
+            CloseServiceHost();
+            SetFirewallRule();
+            OpenServiceHost();
+        }
+
+        private static void SetFirewallRule()
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -139,7 +175,7 @@ namespace YouCast
             };
 
             var port = Settings.Default.OverrideNetworkSettings
-                ? Settings.Default.PortNumber
+                ? int.Parse(Settings.Default.PortNumber)
                 : DefaultPort;
 
             if (Process.Start(processStartInfo).StandardOutput.ReadToEnd().Contains("No rules match"))
@@ -168,17 +204,17 @@ namespace YouCast
             Process.Start(processStartInfo).WaitForExit();
         }
 
-        private void OpenService()
+        private void OpenServiceHost()
         {
-            var svcHost = new WebServiceHost(typeof(YoutubeFeed));
-            svcHost.AddServiceEndpoint(typeof(IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
+            _serviceHost = new WebServiceHost(typeof(YoutubeFeed));
+            _serviceHost.AddServiceEndpoint(typeof(IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
 
             try
             {
-                svcHost.Open();
+                _serviceHost.Open();
 
-                if (svcHost.State != CommunicationState.Opened &&
-                    svcHost.State != CommunicationState.Opening)
+                if (_serviceHost.State != CommunicationState.Opened &&
+                    _serviceHost.State != CommunicationState.Opening)
                 {
                     MessageBox.Show("Failed to register the WCF service. Try running as administrator");
                 }
@@ -186,8 +222,24 @@ namespace YouCast
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
-                svcHost.Close();
+                _serviceHost.Close();
             }
+        }
+
+        private void CloseServiceHost()
+        {
+            if (_serviceHost == null) return;
+
+            try
+            {
+                _serviceHost.Close();
+            }
+            catch (Exception)
+            {
+                _serviceHost.Abort();
+            }
+
+            _serviceHost = null;
         }
 
         private void Window_StateChanged_1(object sender, EventArgs e)
@@ -252,6 +304,14 @@ namespace YouCast
             }
         }
 
+        private void UseCloud_IsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.UseCloudService = UseCloud.IsChecked.GetValueOrDefault();
+            Settings.Default.Save();
+            LoadNetworkSettings();
+            UpdateLocalService();
+        }
+
         private void Change_Click(object sender, RoutedEventArgs e)
         {
             var host = IpAddressLabel.Text;
@@ -265,28 +325,21 @@ namespace YouCast
                     "Invalid Port Number",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
-                PortLabel.Text = DefaultPort;
+                PortLabel.Text = DefaultPort.ToString();
                 return;
             }
 
-            if (!Settings.Default.OverrideNetworkSettings && port == DefaultPort && host == _localIp)
+            if (!Settings.Default.OverrideNetworkSettings && portNumber == DefaultPort && host == _localIp)
             {
                 return;
             }
 
-            if (port != Settings.Default.PortNumber)
-            {
-                MessageBox.Show(
-                    $"The new port will take affect the next time you open {GeneralInformation.ApplicationName}.",
-                    $"Reopen {GeneralInformation.ApplicationName}",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-            }
-
-            UpdateNetworkSettings(host, port);
+            SetNetworkSettings(host, port);
+            LoadNetworkSettings();
+            UpdateLocalService();
         }
 
-        private static void UpdateNetworkSettings(string host, string port)
+        private static void SetNetworkSettings(string host, string port)
         {
             Settings.Default.HostName = host;
             Settings.Default.PortNumber = port;

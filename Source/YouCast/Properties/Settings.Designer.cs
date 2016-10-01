@@ -82,5 +82,17 @@ namespace YouCast.Properties {
                 this["StartupWindowState"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseCloudService {
+            get {
+                return ((bool)(this["UseCloudService"]));
+            }
+            set {
+                this["UseCloudService"] = value;
+            }
+        }
     }
 }

@@ -1,45 +1,63 @@
-﻿<Window x:Class="YouCast.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:youCast="clr-namespace:YouCast"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="YouCast.MainWindow"
         Loaded="Window_Loaded_1"
         Icon="rss.ico"
         StateChanged="Window_StateChanged_1"
         FontFamily="tahoma"
         FontSize="13"
         Title="{x:Static youCast:GeneralInformation.ApplicationName}" 
-        Height="295" 
-        Width="463" 
-        ResizeMode="CanMinimize" 
+        Height="303"
+        Width="463"
+        ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen">
     <TabControl>
         <TabItem Header="Podcast">
-                <StackPanel>
-                    <GroupBox>
+            <StackPanel>
+                <GroupBox>
                     <GroupBox.Header>
-                        <Label>Configuration</Label>
+                        <Label Content="Configuration"/>
                     </GroupBox.Header>
                     <StackPanel>
                         <DockPanel>
-                            <ComboBox Name="ComboBox" DockPanel.Dock="Left" SelectedIndex="0"
-                                        SelectionChanged="ComboBox_SelectionChanged_1">
-                                <ListBoxItem Name="UserNameItem" Content="User Name" />
-                                <ListBoxItem Name="PlaylistItem" Content="Playlist ID" />
+                            <ComboBox 
+                                x:Name="ComboBox" 
+                                DockPanel.Dock="Left" 
+                                SelectedIndex="0"
+                                SelectionChanged="ComboBox_SelectionChanged_1">
+                                <ListBoxItem 
+                                    x:Name="UserNameItem" 
+                                    Content="User Name"/>
+                                <ListBoxItem 
+                                    x:Name="PlaylistItem"
+                                    Content="Playlist ID"/>
                             </ComboBox>
-                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" x:Name="Input"
-                                        VerticalContentAlignment="Center" GotFocus="_input_GotFocus_1"
-                                        TextChanged="_input_TextChanged_1">
-                                For example: I3arnon
-                            </TextBox>
+                            <TextBox
+                                x:Name="Input"
+                                DockPanel.Dock="Right"
+                                HorizontalContentAlignment="Right"
+                                VerticalContentAlignment="Center"
+                                GotFocus="_input_GotFocus_1"
+                                TextChanged="_input_TextChanged_1"
+                                Text="For example: I3arnon"/>
                         </DockPanel>
                         <DockPanel>
                             <DockPanel>
-                                <Label>Preferred Quality:</Label>
+                                <Label Content="Preferred Quality:"/>
                                 <ComboBox MinWidth="130" x:Name="Quality" HorizontalContentAlignment="Right" />
                             </DockPanel>
                             <DockPanel >
-                                <Label DockPanel.Dock="Left">Quantity:</Label>
-                                <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right"  x:Name="MaxLength" VerticalContentAlignment="Center" GotFocus="_maxLength_GotFocus_1"  PreviewTextInput="_maxLength_PreviewTextInput_1" >Unlimited: 0</TextBox>
+                                <Label DockPanel.Dock="Left" Content="Quantity:"/>
+                                <TextBox
+                                    x:Name="MaxLength"
+                                    DockPanel.Dock="Right"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalContentAlignment="Center"
+                                    GotFocus="_maxLength_GotFocus_1"
+                                    PreviewTextInput="_maxLength_PreviewTextInput_1"
+                                    Text="Unlimited: 0" />
                             </DockPanel>
                         </DockPanel>
                     </StackPanel>
@@ -48,19 +66,39 @@
                     <CheckBox 
                         x:Name="CheckBox" Margin="5,5,5,0" 
                         ToolTip="The popular videos will have an older publish date."
-                        VerticalContentAlignment="Center">Sort by Popularity</CheckBox>
+                        VerticalContentAlignment="Center" Content="Sort by Popularity"/>
                     <Button 
+                        x:Name="Generate"
                         ToolTip="Create a link and add it to your favorite podcatcher"
-                        IsDefault="True" x:Name="Generate" IsEnabled="False" Margin="5,5,5,0" Click="Button_Click_1" Height="26">Generate and Copy</Button>
-                    <Button x:Name="Copy" Margin="5,5,5,5" IsEnabled="false" Visibility="Collapsed" Click="Button_Click_2">Copy to clipboard</Button>
+                        IsDefault="True"
+                        IsEnabled="False"
+                        Margin="5,5,5,0"
+                        Height="26"
+                        Click="Generate_Click"
+                        Content="Generate &amp; Copy URL"/>
+                    <Button
+                        x:Name="Copy"
+                        Margin="5,5,5,5"
+                        IsEnabled="false"
+                        Visibility="Collapsed"
+                        Click="Copy_Click"
+                        Content="Copy to clipboard"/>
                 </StackPanel>
                 <GroupBox>
-                    <GroupBox.Header>
-                        Podcast URL
-                    </GroupBox.Header>
+                    <GroupBox.Header>Podcast URL</GroupBox.Header>
                     <DockPanel>
-                        <TextBox  MinHeight="38" IsReadOnly="True" TextWrapping="Wrap" DockPanel.Dock="Top"  x:Name="Output" />
-                        <TextBlock TextWrapping="Wrap" DockPanel.Dock="Bottom" Padding="5">Copy this URL to your favorite podcast app (iTunes, BeyondPod, Pocket Casts, etc.)</TextBlock>
+                        <TextBox
+                            x:Name="Output"
+                            MinHeight="38"
+                            IsReadOnly="True"
+                            TextWrapping="Wrap"
+                            DockPanel.Dock="Top"/>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            DockPanel.Dock="Bottom"
+                            Padding="5">
+                            <Run Text="Copy this URL to your favorite podcast app (iTunes, BeyondPod, Pocket Casts, etc.)"/>
+                        </TextBlock>
                     </DockPanel>
                 </GroupBox>
             </StackPanel>
@@ -69,39 +107,52 @@
             <StackPanel>
                 <GroupBox>
                     <GroupBox.Header>
-                        <Label>Server Details</Label>
+                        <Label Content="Server Details"/>
                     </GroupBox.Header>
                     <StackPanel>
                         <DockPanel>
-                            <Label DockPanel.Dock="Left">Host Address:</Label>
-                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" Name="IpAddressLabel">localhost</TextBox>
+                            <CheckBox 
+                                x:Name="UseCloud"
+                                Height="17"
+                                Content="Use a cloud service instead of your local machine (experimental)"
+                                Checked="UseCloud_IsCheckedChanged"
+                                Unchecked="UseCloud_IsCheckedChanged"/>
+                        </DockPanel>
+                        <Separator Height="10"/>
+                        <DockPanel>
+                            <Label DockPanel.Dock="Left" Content="Host Address:"/>
+                            <TextBox
+                                x:Name="IpAddressLabel"
+                                DockPanel.Dock="Right"
+                                HorizontalContentAlignment="Right"
+                                Text="localhost"/>
                         </DockPanel>
                         <DockPanel>
-                            <Label DockPanel.Dock="Left">Port Number:</Label>
-                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" Name="PortLabel">22703</TextBox>
+                            <Label DockPanel.Dock="Left" Content="Port Number:"/>
+                            <TextBox DockPanel.Dock="Right" HorizontalContentAlignment="Right" x:Name="PortLabel" Text="22703"/>
                         </DockPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button 
                                 x:Name="Change" 
                                 Margin="5,5,5,5"
                                 ToolTip="Change these settings only if you know what you're doing."
-                                Height="26" Click="Change_Click">Change</Button>
+                                Height="26" Click="Change_Click" Content="Change"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox>
                     <GroupBox.Header>
-                        <Label>Configurations</Label>
+                        <Label Content="Configurations"/>
                     </GroupBox.Header>
                     <StackPanel>
                         <DockPanel>
-                            <CheckBox Name="StartMinimized" DockPanel.Dock="Right">Start Minimized</CheckBox>
+                            <CheckBox x:Name="StartMinimized" DockPanel.Dock="Right" Content="Start Minimized"/>
                         </DockPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button 
                                 x:Name="Save" 
                                 Margin="5,5,5,5"
-                                Height="26" Click="Save_OnClick">Save</Button>
+                                Height="26" Click="Save_OnClick" Content="Save"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -112,20 +163,20 @@
                 <StackPanel Orientation="Horizontal">
                     <Image HorizontalAlignment="Left" Source="rss.ico" Height="90" />
                     <Button 
-                        Name="YoucastLink" 
+                        x:Name="YoucastLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="YoucastLink_OnClick">YouCast v2.1.</Button>
-                    <Label VerticalAlignment="Center">Made by</Label>
+                        Click="YoucastLink_OnClick" Content="YouCast v2.1."/>
+                    <Label VerticalAlignment="Center" Content="Made by"/>
                     <Button 
-                        Name="TwitterLink" 
+                        x:Name="TwitterLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="TwitterLink_OnClick">@i3arnon</Button>
-                    <Label VerticalAlignment="Center">under the </Label>
+                        Click="TwitterLink_OnClick" Content="@i3arnon"/>
+                    <Label VerticalAlignment="Center" Content="under the"/>
                     <Button 
-                        Name="GplLink" 
+                        x:Name="GplLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="GplLink_OnClick">GPLv2</Button>
-                    <Label VerticalAlignment="Center">license.</Label>
+                        Click="GplLink_OnClick" Content="GPLv2"/>
+                    <Label VerticalAlignment="Center" Content="license."/>
                 </StackPanel>
             </StackPanel>
         </TabItem>
