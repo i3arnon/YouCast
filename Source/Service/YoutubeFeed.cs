@@ -225,7 +225,7 @@ namespace Service
                         new XAttribute("type", "audio/mp4"),
                         new XAttribute(
                             "url",
-                            baseAddress + $"/{"Audio.m4a"}?videoId={playlistItem.Snippet.ResourceId.VideoId}")).CreateReader());
+                            baseAddress + $"/Audio.m4a?videoId={playlistItem.Snippet.ResourceId.VideoId}")).CreateReader());
             }
             else
             {
@@ -235,7 +235,7 @@ namespace Service
                         new XAttribute("type", "video/mp4"),
                         new XAttribute(
                             "url",
-                            baseAddress + $"/{"Video.mp4"}?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
+                            baseAddress + $"/Video.mp4?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
             }
 
             return item;
