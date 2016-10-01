@@ -1,6 +1,7 @@
 ﻿using Service;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -161,47 +162,46 @@ namespace YouCast
             OpenServiceHost();
         }
 
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static void SetFirewallRule()
         {
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = "netsh",
-                Arguments =
-                    $"advfirewall firewall show rule name=\"{GeneralInformation.ApplicationName}\"",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = true,
-            };
+            var isExists = !Process.Start(
+                    new ProcessStartInfo
+                    {
+                        FileName = "netsh",
+                        Arguments =
+                            $"advfirewall firewall show rule name=\"{GeneralInformation.ApplicationName}\"",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        CreateNoWindow = true,
+                    }).
+                StandardOutput.
+                ReadToEnd().
+                Contains("No rules match");
 
             var port = Settings.Default.OverrideNetworkSettings
                 ? int.Parse(Settings.Default.PortNumber)
                 : DefaultPort;
 
-            if (Process.Start(processStartInfo).StandardOutput.ReadToEnd().Contains("No rules match"))
-            {
-                processStartInfo = new ProcessStartInfo
-                {
-                    FileName = "netsh",
-                    Arguments =
-                        $"advfirewall firewall add rule name=\"{GeneralInformation.ApplicationName}\" dir=in action=allow protocol=TCP localport={port}",
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                };
-            }
-            else
-            {
-                processStartInfo = new ProcessStartInfo
-                {
-                    FileName = "netsh",
-                    Arguments =
-                        $"advfirewall firewall set rule name=\"{GeneralInformation.ApplicationName}\" new localport={port}",
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                };
-            }
-
-            Process.Start(processStartInfo).WaitForExit();
+            Process.Start(
+                    isExists
+                        ? new ProcessStartInfo
+                        {
+                            FileName = "netsh",
+                            Arguments = $"advfirewall firewall set rule name=\"{GeneralInformation.ApplicationName}\" new localport={port}",
+                            CreateNoWindow = true,
+                            WindowStyle = ProcessWindowStyle.Hidden,
+                        }
+                        : new ProcessStartInfo
+                        {
+                            FileName = "netsh",
+                            Arguments =
+                                $"advfirewall firewall add rule name=\"{GeneralInformation.ApplicationName}\" dir=in action=allow protocol=TCP localport={port}",
+                            CreateNoWindow = true,
+                            WindowStyle = ProcessWindowStyle.Hidden,
+                        }).
+                WaitForExit();
         }
 
         private void OpenServiceHost()
