@@ -155,7 +155,10 @@ namespace YouCast
 
         private void UpdateLocalService()
         {
-            if (Settings.Default.UseCloudService) return;
+            if (Settings.Default.UseCloudService)
+            {
+                return;
+            }
 
             CloseServiceHost();
             SetFirewallRule();
@@ -228,7 +231,10 @@ namespace YouCast
 
         private void CloseServiceHost()
         {
-            if (_serviceHost == null) return;
+            if (_serviceHost == null)
+            {
+                return;
+            }
 
             try
             {
@@ -259,7 +265,11 @@ namespace YouCast
 
         private void _input_GotFocus_1(object sender, RoutedEventArgs e)
         {
-            if (_gotFocus) return;
+            if (_gotFocus)
+            {
+                return;
+            }
+
             Generate.IsEnabled = true;
             Input.Text = string.Empty;
             _gotFocus = true;
@@ -267,13 +277,20 @@ namespace YouCast
 
         private void _input_TextChanged_1(object sender, TextChangedEventArgs e)
         {
-            if (Generate == null) return;
+            if (Generate == null)
+            {
+                return;
+            }
+
             Generate.IsEnabled = !string.IsNullOrWhiteSpace(Input.Text);
         }
 
         private void ComboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            if (!IsLoaded) return;
+            if (!IsLoaded)
+            {
+                return;
+            }
 
             if (e.AddedItems.Contains(UserNameItem))
             {
@@ -289,7 +306,11 @@ namespace YouCast
 
         private void _maxLength_GotFocus_1(object sender, RoutedEventArgs e)
         {
-            if (_maxLengthFocus) return;
+            if (_maxLengthFocus)
+            {
+                return;
+            }
+
             MaxLength.Text = string.Empty;
             _maxLengthFocus = true;
         }

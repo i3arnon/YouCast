@@ -43,7 +43,10 @@ namespace Service
 
         private static void WriteItunesElement(XmlWriter writer, string name, string value)
         {
-            if (value == null) return;
+            if (value == null)
+            {
+                return;
+            }
 
             writer.WriteStartElement(_prefix, name, _namespace);
             writer.WriteValue(value);
