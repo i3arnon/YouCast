@@ -2,7 +2,8 @@
   "dependencies": {
     "Google.Apis.YouTube.v3": "1.32.0.1079",
     "morelinq": "2.9.0",
-    "VideoLibrary": "1.3.6-alpha"
+    "VideoLibrary": "1.3.6-alpha",
+    "YoutubeExplode": "4.0.0"
   },
   "frameworks": {
     "net461": {}

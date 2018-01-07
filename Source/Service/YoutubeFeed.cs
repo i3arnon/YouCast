@@ -12,6 +12,8 @@ using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using VideoLibrary;
+using YoutubeExplode;
+using YoutubeExplode.Models.MediaStreams;
 using Video = Google.Apis.YouTube.v3.Data.Video;
 using YouTubeService = Google.Apis.YouTube.v3.YouTubeService;
 
@@ -24,10 +26,12 @@ namespace Service
         private const string _videoUrlFormat = "http://www.youtube.com/watch?v={0}";
         private const string _playlistUrlFormat = "http://www.youtube.com/playlist?list={0}";
 
+        private readonly YoutubeClient _youtubeClient;
         private readonly YouTubeService _youtubeService;
 
         public YoutubeFeed()
         {
+            _youtubeClient= new YoutubeClient();
             _youtubeService =
                 new YouTubeService(
                     new BaseClientService.Initializer
@@ -128,26 +132,35 @@ namespace Service
 
         public async Task GetVideoAsync(string videoId, string encoding)
         {
-            var resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(4));
             var context = WebOperationContext.Current;
+            var resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4));
+            var tasks = new []
+            {
+                GetYoutubeExplodeUriAsync(videoId, resolution),
+                GetLibVideoUriAsync(videoId, resolution)
+            };
 
-            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(_videoUrlFormat, videoId));
-            var nonAdaptiveVideos = videos.
-                Where(_ => _.Format == VideoFormat.Mp4 && !_.IsAdaptive).
-                ToList();
-            var nonAdaptiveVideo =
-                nonAdaptiveVideos.FirstOrDefault(_ => _.Resolution == resolution) ??
-                nonAdaptiveVideos.MaxBy(_ => _.Resolution);
-            if (nonAdaptiveVideo != null)
+            foreach (var task in tasks)
             {
-                var redirectUri = await nonAdaptiveVideo.GetUriAsync();
-                context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
-                context.OutgoingResponse.Headers["Location"] = redirectUri;
+                try
+                {
+                    var redirectUri = await task;
+                    if (redirectUri == null)
+                    {
+                        continue;
+                    }
+
+                    context.OutgoingResponse.StatusCode = HttpStatusCode.Redirect;
+                    context.OutgoingResponse.Headers["Location"] = redirectUri;
+                    return;
+                }
+                catch (Exception exception)
+                {
+                    ExceptionHandler.Handle(exception);
+                }
             }
-            else
-            {
-                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-            }
+
+            context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
         }
 
         public async Task GetAudioAsync(string videoId)
@@ -272,6 +285,27 @@ namespace Service
             statisticsRequest.MaxResults = 50;
             statisticsRequest.Fields = "items(id,statistics)";
             return (await statisticsRequest.ExecuteAsync()).Items;
+        }
+
+        private async Task<string> GetYoutubeExplodeUriAsync(string videoId, int resolution)
+        {
+            var streamInfoSet = await _youtubeClient.GetVideoMediaStreamInfosAsync(videoId);
+            var muxedStreamInfo =
+                streamInfoSet.Muxed.FirstOrDefault(_ => _.VideoQuality.GetResolution() == resolution) ??
+                streamInfoSet.Muxed.WithHighestVideoQuality();
+
+            return muxedStreamInfo?.Url;
+        }
+
+        private async Task<string> GetLibVideoUriAsync(string videoId, int resolution)
+        {
+            var videos = await YouTube.Default.GetAllVideosAsync(string.Format(_videoUrlFormat, videoId));
+            var nonAdaptiveVideos = videos.Where(_ => _.Format == VideoFormat.Mp4 && !_.IsAdaptive).ToList();
+            var nonAdaptiveVideo =
+                nonAdaptiveVideos.FirstOrDefault(_ => _.Resolution == resolution) ??
+                nonAdaptiveVideos.MaxBy(_ => _.Resolution);
+
+            return nonAdaptiveVideo == null ? null : await nonAdaptiveVideo.GetUriAsync();
         }
 
         private static string GetTitle(string title, Arguments arguments) =>
