@@ -4,5 +4,8 @@
   },
   "runtimes": {
     "win": {}
+  },
+  "dependencies": {
+    "Costura.Fody": "1.6.2"
   }
 }
