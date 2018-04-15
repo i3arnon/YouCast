@@ -6,6 +6,6 @@
     "win": {}
   },
   "dependencies": {
-    "Costura.Fody": "1.6.2"
+    "Costura.Fody": "2.0.0"
   }
 }
