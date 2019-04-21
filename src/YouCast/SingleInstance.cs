@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting;
@@ -16,6 +17,7 @@ using System.Windows.Threading;
 
 namespace YouCast
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum WM
     {
         NULL = 0x0000,
@@ -147,12 +149,13 @@ namespace YouCast
         private static extern IntPtr _LocalFree(IntPtr hMem);
 
 
+        [SuppressMessage("ReSharper", "UnusedVariable")]
         public static string[] CommandLineToArgvW(string cmdLine)
         {
             IntPtr argv = IntPtr.Zero;
             try
             {
-                int numArgs = 0;
+                int numArgs;
 
                 argv = _CommandLineToArgvW(cmdLine, out numArgs);
                 if (argv == IntPtr.Zero)
@@ -196,6 +199,8 @@ namespace YouCast
     /// running as Administrator, can activate it with command line arguments.
     /// For most apps, this will not be much of an issue.
     /// </remarks>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     public static class SingleInstance<TApplication>
                 where TApplication : Application, ISingleInstanceApp
     {

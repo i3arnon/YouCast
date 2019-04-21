@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.ServiceModel.Syndication;
 using System.Xml;
 
 namespace Service
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ItunesFeed : SyndicationFeed
     {
         private const string _namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";

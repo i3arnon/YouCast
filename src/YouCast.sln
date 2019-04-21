@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouCast", "YouCast\YouCast.csproj", "{46E83745-F19D-4EB1-BB72-699726DDEA70}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{9D512757-C17F-45AA-B0F0-5702AEB7A437}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouCast.Tests", "YouCast.Tests\YouCast.Tests.csproj", "{7B7DE3E9-69E3-483C-8ACB-1BD6D7028FB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D512757-C17F-45AA-B0F0-5702AEB7A437}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B7DE3E9-69E3-483C-8ACB-1BD6D7028FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B7DE3E9-69E3-483C-8ACB-1BD6D7028FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B7DE3E9-69E3-483C-8ACB-1BD6D7028FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B7DE3E9-69E3-483C-8ACB-1BD6D7028FB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F2680C72-54FC-4DD3-BAA2-1C38D02509E5}
 	EndGlobalSection
 EndGlobal
