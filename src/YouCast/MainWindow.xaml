@@ -2,7 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:youCast="clr-namespace:YouCast"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="YouCast.MainWindow"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:nlogViewer="clr-namespace:NlogViewer;assembly=NlogViewer"
+        mc:Ignorable="d" x:Class="YouCast.MainWindow"
         Loaded="Window_Loaded_1"
         Icon="rss.ico"
         StateChanged="Window_StateChanged_1"
@@ -157,6 +159,9 @@
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
+        </TabItem>
+        <TabItem Header="Logs">
+            <nlogViewer:NlogViewer />
         </TabItem>
         <TabItem Header="About">
             <StackPanel Orientation="Vertical">

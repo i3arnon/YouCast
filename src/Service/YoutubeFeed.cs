@@ -12,6 +12,7 @@ using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using NLog;
 using VideoLibrary;
 using YoutubeExplode;
 using YoutubeExplode.Models.MediaStreams;
@@ -29,6 +30,8 @@ namespace Service
         private const string _videoUrlFormat = "http://www.youtube.com/watch?v={0}";
         private const string _playlistUrlFormat = "http://www.youtube.com/playlist?list={0}";
 
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly YoutubeClient _youtubeClient;
         private readonly YouTubeService _youtubeService;
 
@@ -42,6 +45,8 @@ namespace Service
                         ApiKey = "AIzaSyD0E4ozDor6cgdyQKHvOgLCrrQMEX226Qc",
                         ApplicationName = "YouCast2",
                     });
+
+            Logger.Info($"{nameof(YoutubeFeed)} created");
         }
 
         public async Task<SyndicationFeedFormatter> GetUserFeedAsync(
@@ -50,6 +55,8 @@ namespace Service
             int maxLength,
             bool isPopular)
         {
+            Logger.Info($"{nameof(GetUserFeedAsync)} for user {userId} requested");
+
             var baseAddress = GetBaseAddress();
 
             const string fields = "items(contentDetails,id,snippet)";
@@ -99,6 +106,8 @@ namespace Service
             int maxLength,
             bool isPopular)
         {
+            Logger.Info($"{nameof(GetPlaylistFeedAsync)} for playlist {playlistId} requested");
+
             var baseAddress = GetBaseAddress();
 
             var arguments = new Arguments(
@@ -135,6 +144,8 @@ namespace Service
 
         public async Task GetVideoAsync(string videoId, string encoding)
         {
+            Logger.Info($"{nameof(GetVideoAsync)} for video {videoId} requested");
+
             var context = WebOperationContext.Current;
             var resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4));
             var tasks = new[]
@@ -168,6 +179,8 @@ namespace Service
 
         public async Task GetAudioAsync(string videoId)
         {
+            Logger.Info($"{nameof(GetAudioAsync)} for video {videoId} requested");
+
             var context = WebOperationContext.Current;
 
             var videos = await YouTube.Default.GetAllVideosAsync(string.Format(_videoUrlFormat, videoId));
