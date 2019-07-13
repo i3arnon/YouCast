@@ -52,18 +52,10 @@
     <Folder Include="ServiceWorkerRoleContent\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ServiceWorkerRoleContent\diagnostics.wadcfg">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="ServiceWorkerRoleContent\install.cmd">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="ServiceWorkerRoleContent\NDP461-KB3102438-Web.exe">
-      <SubType>Content</SubType>
-    </Content>
+    <PublishProfile Include="Profiles\YouCastProduction.azurePubxml" />
   </ItemGroup>
   <ItemGroup>
-    <PublishProfile Include="Profiles\YouCastProduction.azurePubxml" />
+    <DiagnosticsConfiguration Include="ServiceWorkerRoleContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

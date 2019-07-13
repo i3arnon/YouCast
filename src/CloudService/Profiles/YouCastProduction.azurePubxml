@@ -19,6 +19,6 @@
     <AzureStorageAccountName>youcast</AzureStorageAccountName>
     <AzureAppendTimestampToDeploymentLabel>True</AzureAppendTimestampToDeploymentLabel>
     <AzureHostedServiceResourceGroup />
-    <EnableApplicationInsights>False</EnableApplicationInsights>
+    <EnableApplicationInsights>True</EnableApplicationInsights>
   </PropertyGroup>
 </Project>

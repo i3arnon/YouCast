@@ -2,6 +2,8 @@
 <ServiceConfiguration serviceName="CloudService" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
   <Role name="ServiceWorkerRole">
     <Instances count="1" />
-    <ConfigurationSettings></ConfigurationSettings>
+    <ConfigurationSettings>
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="0578f9e6-9a71-4493-8b6b-cef5243312ec" />
+    </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
