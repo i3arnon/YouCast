@@ -165,18 +165,12 @@
                     <Button 
                         x:Name="YoucastLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="YoucastLink_OnClick" Content="YouCast v2.6."/>
+                        Click="YoucastLink_OnClick" Content="YouCast."/>
                     <Label VerticalAlignment="Center" Content="Made by"/>
                     <Button 
                         x:Name="TwitterLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="TwitterLink_OnClick" Content="@i3arnon"/>
-                    <Label VerticalAlignment="Center" Content="under the"/>
-                    <Button 
-                        x:Name="GplLink" 
-                        Style="{StaticResource LinkButton}"  
-                        Click="GplLink_OnClick" Content="GPLv2"/>
-                    <Label VerticalAlignment="Center" Content="license."/>
+                        Click="TwitterLink_OnClick" Content="@i3arnon."/>
                 </StackPanel>
             </StackPanel>
         </TabItem>
