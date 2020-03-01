@@ -94,5 +94,35 @@ namespace YouCast.Properties {
                 this["UseCloudService"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string ApplicationName 
+        {
+            get
+            {
+                return (string)this["ApplicationName"];
+            }
+            set
+            {
+                this["ApplicationName"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string APIKey
+        {
+            get
+            {
+                return (string)this["APIKey"];
+            }
+            set
+            {
+                this["APIKey"] = value;
+            }
+        }
     }
 }

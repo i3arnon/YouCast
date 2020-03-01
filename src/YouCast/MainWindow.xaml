@@ -174,5 +174,18 @@
                 </StackPanel>
             </StackPanel>
         </TabItem>
-    </TabControl>
+		<TabItem Header="API Settings">
+			<StackPanel Orientation="Vertical">
+				<DockPanel>
+					<Label DockPanel.Dock="Left">Application Name</Label>
+					<TextBox DockPanel.Dock="Right" x:Name="ApplicationName">YouCast</TextBox>
+				</DockPanel>
+				<DockPanel>
+					<Label DockPanel.Dock="Left">API Key</Label>
+					<TextBox DockPanel.Dock="Right" x:Name="APIKey">00000</TextBox>
+				</DockPanel>
+				<Button Click="SaveAPISettings">Apply</Button>
+			</StackPanel>
+		</TabItem>
+	</TabControl>
 </Window>
