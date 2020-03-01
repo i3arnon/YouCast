@@ -97,7 +97,7 @@ namespace YouCast.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        [global::System.Configuration.DefaultSettingValueAttribute("YouCast2020")]
         public string ApplicationName 
         {
             get
@@ -112,7 +112,7 @@ namespace YouCast.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        [global::System.Configuration.DefaultSettingValueAttribute("AIzaSyANb4I8D4P18fh0GFzk0O_GV6i6XbnJt4Q")]
         public string APIKey
         {
             get
