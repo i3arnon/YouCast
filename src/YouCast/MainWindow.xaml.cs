@@ -54,6 +54,7 @@ namespace YouCast
 
             PopulateQualities();
             LoadNetworkSettings();
+            LoadAPISettings();
         }
 
         private void PopulateQualities()
@@ -94,6 +95,12 @@ namespace YouCast
             IpAddressLabel.Text = hostName;
             PortLabel.Text = port.ToString();
             _baseAddress = new UriBuilder("HTTP", hostName, port == 80 ? -1 : port, "FeedService").ToString();
+        }
+
+        private void LoadAPISettings()
+        {
+            ApplicationName.Text = Settings.Default.ApplicationName;
+            APIKey.Text = Settings.Default.APIKey;
         }
 
         private void Generate_Click(object sender, RoutedEventArgs e)
@@ -209,6 +216,8 @@ namespace YouCast
 
         private void OpenServiceHost()
         {
+            YoutubeFeed.ApplicationName = Settings.Default.ApplicationName;
+            YoutubeFeed.APIKey = Settings.Default.APIKey;
             _serviceHost = new WebServiceHost(typeof(YoutubeFeed));
             _serviceHost.AddServiceEndpoint(typeof(IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
 
@@ -358,6 +367,16 @@ namespace YouCast
             SetNetworkSettings(host, port);
             LoadNetworkSettings();
             UpdateLocalService();
+        }
+
+        private void SaveAPISettings(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.ApplicationName = ApplicationName.Text;
+            Settings.Default.APIKey = APIKey.Text;
+            Settings.Default.Save();
+
+            CloseServiceHost();
+            OpenServiceHost();
         }
 
         private static void SetNetworkSettings(string host, string port)

@@ -30,6 +30,9 @@ namespace Service
         private readonly YoutubeClient _youtubeClient;
         private readonly YouTubeService _youtubeService;
 
+        public static string ApplicationName = "YouCast2020";
+        public static string APIKey = "AIzaSyANb4I8D4P18fh0GFzk0O_GV6i6XbnJt4Q";
+
         public YoutubeFeed()
         {
             _feedCache = new Cache<Arguments, SyndicationFeedFormatter>(15.Minutes());
@@ -40,8 +43,8 @@ namespace Service
                 new YouTubeService(
                     new BaseClientService.Initializer
                     {
-                        ApiKey = "AIzaSyANb4I8D4P18fh0GFzk0O_GV6i6XbnJt4Q",
-                        ApplicationName = "YouCast2020"
+                        ApiKey = APIKey,
+                        ApplicationName = ApplicationName
                     });
         }
 
