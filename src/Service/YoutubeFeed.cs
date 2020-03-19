@@ -18,7 +18,10 @@ using YouTubeService = Google.Apis.YouTube.v3.YouTubeService;
 
 namespace Service
 {
-    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
+    [ServiceBehavior(
+        ConcurrencyMode = ConcurrencyMode.Multiple,
+        InstanceContextMode = InstanceContextMode.Single,
+        UseSynchronizationContext = false)]
     public sealed class YoutubeFeed : IYoutubeFeed
     {
         private const string _channelUrlFormat = "http://www.youtube.com/channel/{0}";
@@ -30,10 +33,7 @@ namespace Service
         private readonly YoutubeClient _youtubeClient;
         private readonly YouTubeService _youtubeService;
 
-        public static string ApplicationName = "YouCast2020";
-        public static string APIKey = "AIzaSyANb4I8D4P18fh0GFzk0O_GV6i6XbnJt4Q";
-
-        public YoutubeFeed()
+        public YoutubeFeed(string applicationName, string apiKey)
         {
             _feedCache = new Cache<Arguments, SyndicationFeedFormatter>(15.Minutes());
             _contentCache = new Cache<(string videoId, string encoding), string>(2.Hours());
@@ -43,8 +43,8 @@ namespace Service
                 new YouTubeService(
                     new BaseClientService.Initializer
                     {
-                        ApiKey = APIKey,
-                        ApplicationName = ApplicationName
+                        ApiKey = apiKey,
+                        ApplicationName = applicationName
                     });
         }
 

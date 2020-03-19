@@ -53,8 +53,8 @@ namespace YouCast
                 AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
             PopulateQualities();
+            LoadApiSettings();
             LoadNetworkSettings();
-            LoadAPISettings();
         }
 
         private void PopulateQualities()
@@ -65,6 +65,12 @@ namespace YouCast
             }
 
             Quality.SelectedIndex = 0;
+        }
+
+        private void LoadApiSettings()
+        {
+            ApplicationName.Text = Settings.Default.ApplicationName;
+            ApiKey.Text = Settings.Default.ApiKey;
         }
 
         private void LoadNetworkSettings()
@@ -95,12 +101,6 @@ namespace YouCast
             IpAddressLabel.Text = hostName;
             PortLabel.Text = port.ToString();
             _baseAddress = new UriBuilder("HTTP", hostName, port == 80 ? -1 : port, "FeedService").ToString();
-        }
-
-        private void LoadAPISettings()
-        {
-            ApplicationName.Text = Settings.Default.ApplicationName;
-            APIKey.Text = Settings.Default.APIKey;
         }
 
         private void Generate_Click(object sender, RoutedEventArgs e)
@@ -216,9 +216,11 @@ namespace YouCast
 
         private void OpenServiceHost()
         {
-            YoutubeFeed.ApplicationName = Settings.Default.ApplicationName;
-            YoutubeFeed.APIKey = Settings.Default.APIKey;
-            _serviceHost = new WebServiceHost(typeof(YoutubeFeed));
+            _serviceHost =
+                new WebServiceHost(
+                    new YoutubeFeed(
+                        Settings.Default.ApplicationName,
+                        Settings.Default.ApiKey));
             _serviceHost.AddServiceEndpoint(typeof(IYoutubeFeed), new WebHttpBinding(), new Uri(_baseAddress));
 
             try
@@ -369,14 +371,13 @@ namespace YouCast
             UpdateLocalService();
         }
 
-        private void SaveAPISettings(object sender, RoutedEventArgs e)
+        private void SetApiSettings(object sender, RoutedEventArgs e)
         {
             Settings.Default.ApplicationName = ApplicationName.Text;
-            Settings.Default.APIKey = APIKey.Text;
+            Settings.Default.ApiKey = ApiKey.Text;
             Settings.Default.Save();
 
-            CloseServiceHost();
-            OpenServiceHost();
+            UpdateLocalService();
         }
 
         private static void SetNetworkSettings(string host, string port)

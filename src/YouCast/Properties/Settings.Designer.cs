@@ -113,15 +113,15 @@ namespace YouCast.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("AIzaSyANb4I8D4P18fh0GFzk0O_GV6i6XbnJt4Q")]
-        public string APIKey
+        public string ApiKey
         {
             get
             {
-                return (string)this["APIKey"];
+                return (string)this["ApiKey"];
             }
             set
             {
-                this["APIKey"] = value;
+                this["ApiKey"] = value;
             }
         }
     }
