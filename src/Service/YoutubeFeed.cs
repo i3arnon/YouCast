@@ -92,7 +92,7 @@ namespace Service
                 listRequestForId.Fields = "items(contentDetails,id,snippet)";
 
                 var channelListResponse = await listRequestForId.ExecuteAsync();
-                return channelListResponse?.Items.Single();
+                return channelListResponse.Items?.Single();
             }
 
             async Task<Channel> FindChannelAsync(string username)
@@ -103,7 +103,7 @@ namespace Service
                 listRequestForUsername.Fields = "items(contentDetails,id,snippet)";
 
                 var channelListResponse = await listRequestForUsername.ExecuteAsync();
-                return channelListResponse?.Items.Single();
+                return channelListResponse.Items?.Single();
             }
         }
 
