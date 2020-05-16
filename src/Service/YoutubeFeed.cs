@@ -56,21 +56,9 @@ namespace Service
         {
             var baseAddress = GetBaseAddress();
 
-            const string fields = "items(contentDetails,id,snippet)";
-            var listRequestForUsername = _youtubeService.Channels.List("snippet,contentDetails");
-            listRequestForUsername.ForUsername = userId;
-            listRequestForUsername.MaxResults = 1;
-            listRequestForUsername.Fields = fields;
-
-            var listRequestForId = _youtubeService.Channels.List("snippet,contentDetails");
-            listRequestForId.Id = userId;
-            listRequestForId.MaxResults = 1;
-            listRequestForId.Fields = fields;
-
-            var channel = (await Task.WhenAll(listRequestForUsername.ExecuteAsync(), listRequestForId.ExecuteAsync())).
-                SelectMany(_ => _.Items).
-                First();
-
+            var channel = 
+                await GetChannelAsync(userId) ?? 
+                await FindChannelAsync(userId);
             var arguments = new Arguments(
                 channel.ContentDetails.RelatedPlaylists.Uploads,
                 encoding,
@@ -95,6 +83,28 @@ namespace Service
             };
 
             return CacheFeed(arguments, feed);
+
+            async Task<Channel> GetChannelAsync(string id)
+            {
+                var listRequestForId = _youtubeService.Channels.List("snippet,contentDetails");
+                listRequestForId.Id = id;
+                listRequestForId.MaxResults = 1;
+                listRequestForId.Fields = "items(contentDetails,id,snippet)";
+
+                var channelListResponse = await listRequestForId.ExecuteAsync();
+                return channelListResponse?.Items.Single();
+            }
+
+            async Task<Channel> FindChannelAsync(string username)
+            {
+                var listRequestForUsername = _youtubeService.Channels.List("snippet,contentDetails");
+                listRequestForUsername.ForUsername = username;
+                listRequestForUsername.MaxResults = 1;
+                listRequestForUsername.Fields = "items(contentDetails,id,snippet)";
+
+                var channelListResponse = await listRequestForUsername.ExecuteAsync();
+                return channelListResponse?.Items.Single();
+            }
         }
 
         public async Task<SyndicationFeedFormatter> GetPlaylistFeedAsync(
