@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3.Data;
-using Humanizer;
 using MoreLinq;
 using YoutubeExplode;
 using YoutubeExplode.Videos;
@@ -28,16 +27,11 @@ namespace Service
         private const string _videoUrlFormat = "http://www.youtube.com/watch?v={0}";
         private const string _playlistUrlFormat = "http://www.youtube.com/playlist?list={0}";
 
-        private readonly Cache<Arguments, SyndicationFeedFormatter> _feedCache;
-        private readonly Cache<(string videoId, string encoding), string> _contentCache;
         private readonly YoutubeClient _youtubeClient;
         private readonly YouTubeService _youtubeService;
 
         public YoutubeFeed(string applicationName, string apiKey)
         {
-            _feedCache = new Cache<Arguments, SyndicationFeedFormatter>(15.Minutes());
-            _contentCache = new Cache<(string videoId, string encoding), string>(2.Hours());
-
             _youtubeClient = new YoutubeClient();
             _youtubeService =
                 new YouTubeService(
@@ -65,11 +59,6 @@ namespace Service
                 maxLength,
                 isPopular);
 
-            if (_feedCache.TryGet(arguments, out var formatter))
-            {
-                return formatter;
-            }
-
             var feed = new ItunesFeed(
                 GetTitle(channel.Snippet.Title, arguments),
                 channel.Snippet.Description,
@@ -82,7 +71,7 @@ namespace Service
                     arguments),
             };
 
-            return CacheFeed(arguments, feed);
+            return feed.GetRss20Formatter();
 
             async Task<Channel> GetChannelAsync(string id)
             {
@@ -121,11 +110,6 @@ namespace Service
                 maxLength,
                 isPopular);
 
-            if (_feedCache.TryGet(arguments, out var formatter))
-            {
-                return formatter;
-            }
-
             var playlistRequest = _youtubeService.Playlists.List("snippet");
             playlistRequest.Id = playlistId;
             playlistRequest.MaxResults = 1;
@@ -144,12 +128,12 @@ namespace Service
                     arguments),
             };
 
-            return CacheFeed(arguments, feed);
+            return feed.GetRss20Formatter();
         }
 
         public async Task GetVideoAsync(string videoId, string encoding)
         {
-            await GetContentAsync(videoId, encoding, GetVideoUriAsync);
+            await GetContentAsync(GetVideoUriAsync);
 
             async Task<string> GetVideoUriAsync()
             {
@@ -174,7 +158,7 @@ namespace Service
 
         public async Task GetAudioAsync(string videoId)
         {
-            await GetContentAsync(videoId, "Audio", GetAudioUriAsync);
+            await GetContentAsync(GetAudioUriAsync);
 
             async Task<string> GetAudioUriAsync()
             {
@@ -186,16 +170,11 @@ namespace Service
             }
         }
 
-        private async Task GetContentAsync(string videoId, string encoding, Func<Task<string>> getContentUriAsync)
+        private async Task GetContentAsync(Func<Task<string>> getContentUriAsync)
         {
             var context = WebOperationContext.Current;
 
-            if (_contentCache.TryGet((videoId, encoding), out var redirectUri))
-            {
-                context.OutgoingResponse.RedirectTo(redirectUri);
-                return;
-            }
-
+            string redirectUri;
             try
             {
                 redirectUri = await getContentUriAsync();
@@ -205,7 +184,6 @@ namespace Service
                 redirectUri = null;
             }
 
-            _contentCache.Set((videoId, encoding), redirectUri);
             context.OutgoingResponse.RedirectTo(redirectUri);
         }
 
@@ -315,13 +293,6 @@ namespace Service
 
         private static string GetTitle(string title, Arguments arguments) =>
             arguments.IsPopular ? $"{title} (By Popularity)" : title;
-
-        private Rss20FeedFormatter CacheFeed(Arguments arguments, SyndicationFeed feed)
-        {
-            var formatter = feed.GetRss20Formatter();
-            _feedCache.Set(arguments, formatter);
-            return formatter;
-        }
 
         private static string GetBaseAddress()
         {
