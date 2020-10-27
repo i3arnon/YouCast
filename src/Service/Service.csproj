@@ -54,7 +54,7 @@
     <PackageReference Include="morelinq" Version="[2.9.0]" />
     <PackageReference Include="Newtonsoft.Json" Version="[12.0.2]" />
     <PackageReference Include="System.ValueTuple" Version="[4.5.0]" />
-    <PackageReference Include="YoutubeExplode" Version="5.1.7" />
+    <PackageReference Include="YoutubeExplode" Version="5.1.8" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="obj\**" />
