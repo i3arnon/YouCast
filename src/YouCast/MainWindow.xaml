@@ -178,7 +178,7 @@
                     <Button 
                         x:Name="YoucastLink" 
                         Style="{StaticResource LinkButton}"  
-                        Click="YoucastLink_OnClick" Content="YouCast v2.16."/>
+                        Click="YoucastLink_OnClick" Content="YouCast v2.17."/>
                     <Label VerticalAlignment="Center" Content="Made by"/>
                     <Button 
                         x:Name="TwitterLink" 

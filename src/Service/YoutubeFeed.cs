@@ -48,30 +48,32 @@ namespace Service
             int maxLength,
             bool isPopular)
         {
-            var baseAddress = GetBaseAddress();
+            return await GetFeedFormatterAsync(GetFeedAsync);
 
-            var channel = 
-                await GetChannelAsync(userId) ?? 
-                await FindChannelAsync(userId);
-            var arguments = new Arguments(
-                channel.ContentDetails.RelatedPlaylists.Uploads,
-                encoding,
-                maxLength,
-                isPopular);
-
-            var feed = new ItunesFeed(
-                GetTitle(channel.Snippet.Title, arguments),
-                channel.Snippet.Description,
-                new Uri(string.Format(_channelUrlFormat, channel.Id)))
+            async Task<ItunesFeed> GetFeedAsync(string baseAddress)
             {
-                ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
-                Items = await GenerateItemsAsync(
-                    baseAddress,
-                    channel.Snippet.PublishedAt.GetValueOrDefault(),
-                    arguments),
-            };
+                var channel =
+                    await GetChannelAsync(userId) ??
+                    await FindChannelAsync(userId);
 
-            return feed.GetRss20Formatter();
+                var arguments = new Arguments(
+                    channel.ContentDetails.RelatedPlaylists.Uploads,
+                    encoding,
+                    maxLength,
+                    isPopular);
+
+                return new ItunesFeed(
+                    GetTitle(channel.Snippet.Title, arguments),
+                    channel.Snippet.Description,
+                    new Uri(string.Format(_channelUrlFormat, channel.Id)))
+                {
+                    ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
+                    Items = await GenerateItemsAsync(
+                        baseAddress,
+                        channel.Snippet.PublishedAt.GetValueOrDefault(),
+                        arguments)
+                };
+            }
 
             async Task<Channel> GetChannelAsync(string id)
             {
@@ -102,33 +104,35 @@ namespace Service
             int maxLength,
             bool isPopular)
         {
-            var baseAddress = GetBaseAddress();
+            return await GetFeedFormatterAsync(GetFeedAsync);
 
-            var arguments = new Arguments(
-                playlistId,
-                encoding,
-                maxLength,
-                isPopular);
-
-            var playlistRequest = _youtubeService.Playlists.List("snippet");
-            playlistRequest.Id = playlistId;
-            playlistRequest.MaxResults = 1;
-
-            var playlist = (await playlistRequest.ExecuteAsync()).Items.First();
-
-            var feed = new ItunesFeed(
-                GetTitle(playlist.Snippet.Title, arguments),
-                playlist.Snippet.Description,
-                new Uri(string.Format(_playlistUrlFormat, playlist.Id)))
+            async Task<ItunesFeed> GetFeedAsync(string baseAddress)
             {
-                ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
-                Items = await GenerateItemsAsync(
-                    baseAddress,
-                    playlist.Snippet.PublishedAt.GetValueOrDefault(),
-                    arguments),
-            };
+                var arguments =
+                    new Arguments(
+                        playlistId,
+                        encoding,
+                        maxLength,
+                        isPopular);
 
-            return feed.GetRss20Formatter();
+                var playlistRequest = _youtubeService.Playlists.List("snippet");
+                playlistRequest.Id = playlistId;
+                playlistRequest.MaxResults = 1;
+
+                var playlist = (await playlistRequest.ExecuteAsync()).Items.First();
+
+                return new ItunesFeed(
+                    GetTitle(playlist.Snippet.Title, arguments),
+                    playlist.Snippet.Description,
+                    new Uri(string.Format(_playlistUrlFormat, playlist.Id)))
+                {
+                    ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
+                    Items = await GenerateItemsAsync(
+                        baseAddress,
+                        playlist.Snippet.PublishedAt.GetValueOrDefault(),
+                        arguments)
+                };
+            }
         }
 
         public async Task GetVideoAsync(string videoId, string encoding)
@@ -168,6 +172,17 @@ namespace Service
                     ? audios.MaxBy(audio => audio.Bitrate).Url
                     : null;
             }
+        }
+
+        private async Task<SyndicationFeedFormatter> GetFeedFormatterAsync(Func<string, Task<ItunesFeed>> getFeedAsync)
+        {
+            var transportAddress = OperationContext.Current.IncomingMessageProperties.Via;
+            var baseAddress = $"http://{transportAddress.DnsSafeHost}:{transportAddress.Port}/FeedService";
+
+            WebOperationContext.Current.OutgoingResponse.ContentType = "application/rss+xml; charset=utf-8";
+
+            var feed = await getFeedAsync(baseAddress);
+            return feed.GetRss20Formatter();
         }
 
         private async Task GetContentAsync(Func<Task<string>> getContentUriAsync)
