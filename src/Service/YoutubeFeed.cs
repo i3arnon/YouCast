@@ -11,7 +11,6 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3.Data;
 using MoreLinq;
 using YoutubeExplode;
-using YoutubeExplode.Videos;
 using Video = Google.Apis.YouTube.v3.Data.Video;
 using YouTubeService = Google.Apis.YouTube.v3.YouTubeService;
 
@@ -150,10 +149,10 @@ namespace Service
                 {
                 }
 
-                var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(new VideoId(videoId));
-                var muxedStreamInfos = streamManifest.GetMuxed().ToList();
+                var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
+                var muxedStreamInfos = streamManifest.GetMuxedStreams().ToList();
                 var muxedStreamInfo =
-                    muxedStreamInfos.FirstOrDefault(_ => _.VideoQuality.GetResolution() == resolution) ??
+                    muxedStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
                     muxedStreamInfos.MaxBy(_ => _.VideoQuality);
 
                 return muxedStreamInfo?.Url;
@@ -166,8 +165,8 @@ namespace Service
 
             async Task<string> GetAudioUriAsync()
             {
-                var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(new VideoId(videoId));
-                var audios = streamManifest.GetAudioOnly().ToList();
+                var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
+                var audios = streamManifest.GetAudioOnlyStreams().ToList();
                 return audios.Count > 0
                     ? audios.MaxBy(audio => audio.Bitrate).Url
                     : null;
