@@ -153,7 +153,7 @@ namespace Service
                 var muxedStreamInfos = streamManifest.GetMuxedStreams().ToList();
                 var muxedStreamInfo =
                     muxedStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
-                    muxedStreamInfos.MaxBy(_ => _.VideoQuality);
+                    muxedStreamInfos.MaxBy(_ => _.VideoQuality).FirstOrDefault();
 
                 return muxedStreamInfo?.Url;
             }
@@ -168,7 +168,7 @@ namespace Service
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 var audios = streamManifest.GetAudioOnlyStreams().ToList();
                 return audios.Count > 0
-                    ? audios.MaxBy(audio => audio.Bitrate).Url
+                    ? audios.MaxBy(audio => audio.Bitrate).FirstOrDefault().Url
                     : null;
             }
         }
