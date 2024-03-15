@@ -69,7 +69,7 @@ namespace Service
                     ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        channel.Snippet.PublishedAt.GetValueOrDefault(),
+                        channel.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
                         arguments)
                 };
             }
@@ -128,7 +128,7 @@ namespace Service
                     ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        playlist.Snippet.PublishedAt.GetValueOrDefault(),
+                        playlist.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
                         arguments)
                 };
             }
@@ -153,7 +153,7 @@ namespace Service
                 var muxedStreamInfos = streamManifest.GetMuxedStreams().ToList();
                 var muxedStreamInfo =
                     muxedStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
-                    muxedStreamInfos.MaxBy(_ => _.VideoQuality).FirstOrDefault();
+                    muxedStreamInfos.Maxima(_ => _.VideoQuality).FirstOrDefault();
 
                 return muxedStreamInfo?.Url;
             }
@@ -168,7 +168,7 @@ namespace Service
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 var audios = streamManifest.GetAudioOnlyStreams().ToList();
                 return audios.Count > 0
-                    ? audios.MaxBy(audio => audio.Bitrate).FirstOrDefault().Url
+                    ? audios.Maxima(audio => audio.Bitrate).FirstOrDefault().Url
                     : null;
             }
         }
@@ -244,7 +244,7 @@ namespace Service
                 new Uri(string.Format(_videoUrlFormat, playlistItem.Snippet.ResourceId.VideoId)))
             {
                 Id = playlistItem.Snippet.ResourceId.VideoId,
-                PublishDate = playlistItem.Snippet.PublishedAt.GetValueOrDefault(),
+                PublishDate = playlistItem.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
                 Summary = new TextSyndicationContent(playlistItem.Snippet.Description),
             };
 
